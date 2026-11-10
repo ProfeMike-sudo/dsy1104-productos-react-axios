@@ -1,0 +1,258 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Guía 19 · Axios, React, Express y DTO | DSY1104</title><style>
+    :root {
+      --duoc-blue:   #002d56;
+      --duoc-yellow: #ffc20e;
+      --accent-blue: #0056b3;
+      --dark-grey:   #333333;
+      --mid-grey:    #555555;
+      --white:       #ffffff;
+      --green:       #1a6b3c;
+      --green-lt:    #e6f4ec;
+      --orange:      #b84b00;
+      --orange-lt:   #fdf0e6;
+      --red:         #a3242f;
+      --red-lt:      #fbe9ea;
+      --code-bg:     #0d1117;
+      --code-text:   #e6edf3;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #e9ecef; color: var(--dark-grey); line-height: 1.8; }
+    .navbar { background: var(--duoc-blue); height: 10px; }
+    header { background: var(--white); border-bottom: 4px solid var(--duoc-yellow); box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+    .header-inner { max-width: 1000px; margin: 0 auto; display: flex; align-items: stretch; min-height: 140px; }
+    .header-badge-col { background: var(--duoc-blue); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 28px; flex-shrink: 0; gap: 6px; }
+    .header-badge-col .guia-num { font-size: 2.1rem; font-weight: 900; color: var(--duoc-yellow); line-height: 1; letter-spacing: 1px; }
+    .header-badge-col .guia-label { font-size: 0.68rem; color: rgba(255,255,255,0.65); text-transform: uppercase; letter-spacing: 2px; font-weight: 600; text-align: center; }
+    .header-text { padding: 28px 32px; display: flex; flex-direction: column; justify-content: center; }
+    .header-text .course-tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-blue); font-weight: 700; margin-bottom: 6px; }
+    .header-text h1 { color: var(--duoc-blue); font-size: 1.6rem; font-weight: 800; line-height: 1.25; margin-bottom: 8px; }
+    .header-text h1 em { font-style: normal; color: var(--accent-blue); }
+    .header-meta { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 4px; }
+    .header-meta span { font-size: 0.82rem; color: var(--mid-grey); }
+    .header-meta span strong { color: var(--duoc-blue); }
+    @media (max-width: 600px) {
+      .header-badge-col { padding: 18px 16px; }
+      .header-text { padding: 20px 16px; }
+      .header-text h1 { font-size: 1.25rem; }
+    }
+    .container { max-width: 1000px; margin: 32px auto; padding: 0 20px 60px; }
+    .section-divider { background: var(--duoc-blue); color: var(--duoc-yellow); padding: 12px 20px; font-size: 0.9rem; font-weight: 700; border-radius: 4px; margin: 36px 0 18px; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+    .section-divider .num { background: var(--duoc-yellow); color: var(--duoc-blue); border-radius: 3px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 900; flex-shrink: 0; }
+    .card { background: var(--white); border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.09); padding: 32px 36px; margin-bottom: 20px; }
+    @media (max-width: 600px) { .card { padding: 20px 16px; } }
+    .card h2 { color: var(--duoc-blue); border-left: 5px solid var(--duoc-yellow); padding-left: 14px; font-size: 1.25rem; margin-bottom: 16px; }
+    .card h3 { color: var(--accent-blue); font-size: 1.05rem; margin: 24px 0 10px; }
+    .card p { margin-bottom: 12px; font-size: 1rem; }
+    .card p:last-child { margin-bottom: 0; }
+    .card ul, .card ol { padding-left: 22px; font-size: 1rem; line-height: 1.85; }
+    .card li { margin-bottom: 4px; }
+    .info-box { background: #e7f3ff; border-left: 5px solid var(--accent-blue); padding: 14px 18px; border-radius: 0 4px 4px 0; margin: 16px 0; font-size: 0.97rem; }
+    .info-box strong { color: var(--duoc-blue); }
+    .warn-box { background: var(--red-lt); border-left: 5px solid var(--red); padding: 14px 18px; border-radius: 0 4px 4px 0; margin: 16px 0; font-size: 0.97rem; }
+    .warn-box strong { color: var(--red); }
+    .clave-box { background: var(--orange-lt); border-left: 5px solid var(--orange); padding: 14px 18px; border-radius: 0 4px 4px 0; margin: 16px 0; font-size: 0.97rem; }
+    .clave-box strong { color: var(--orange); }
+    .ok-box { background: var(--green-lt); border-left: 5px solid var(--green); padding: 14px 18px; border-radius: 0 4px 4px 0; margin: 16px 0; font-size: 0.97rem; }
+    .ok-box strong { color: var(--green); }
+    .badge { display: inline-block; font-size: 0.72rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border-radius: 3px; margin-bottom: 14px; }
+    .badge-todos { background: var(--orange-lt); color: var(--orange); border: 1.5px solid #f0c9a8; }
+    .badge-eq { background: var(--green-lt); color: var(--green); border: 1.5px solid #9ad9c0; }
+    .steps { list-style: none; margin: 14px 0; padding: 0; counter-reset: step; }
+    .steps li { position: relative; padding-left: 36px; margin-bottom: 14px; counter-increment: step; font-size: 0.97rem; }
+    .steps li::before { content: counter(step); position: absolute; left: 0; top: 1px; width: 24px; height: 24px; background: var(--duoc-yellow); color: var(--duoc-blue); border-radius: 50%; font-weight: 900; font-size: 0.78rem; display: flex; align-items: center; justify-content: center; }
+    .steps li strong { color: var(--duoc-blue); }
+    code { font-family: 'Courier New', monospace; background: #eef0f4; padding: 1px 5px; border-radius: 3px; font-size: 0.87em; color: var(--duoc-blue); }
+    .ref-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9rem; }
+    .ref-table th { background: var(--duoc-blue); color: var(--white); text-align: left; padding: 10px 12px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .ref-table td { padding: 10px 12px; border-bottom: 1px solid #e3e7ee; vertical-align: top; }
+    .ref-table tr:nth-child(even) td { background: #f6f8fb; }
+    @media (max-width: 600px) { .ref-table { display: block; overflow-x: auto; } }
+    footer { background: var(--duoc-blue); color: rgba(255,255,255,0.5); text-align: center; padding: 18px; font-size: 0.82rem; margin-top: 40px; }
+    footer strong { color: var(--duoc-yellow); }
+    .code-wrap { border-radius: 6px; overflow: hidden; margin: 16px 0; border: 1px solid #30363d; }
+    .code-header { background: #161b22; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #30363d; }
+    .code-header .dots { display: flex; gap: 5px; }
+    .code-header .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; } .dot-y { background: #febc2e; } .dot-g { background: #28c840; }
+    .code-header .lang { font-family: 'Courier New', monospace; font-size: 0.72rem; color: #8b949e; letter-spacing: 0.5px; }
+    pre { background: var(--code-bg); padding: 20px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.65; color: var(--code-text); }
+    .t-ok { color: #7ee787; } .t-bad { color: #ff7b72; } .t-dim { color: #8b949e; }
+    /* Anatomía de una prueba */
+    .anatomia { display: grid; gap: 10px; margin: 16px 0; }
+    .anat-nivel { border: 1.5px solid #dde4ee; border-radius: 6px; padding: 12px 16px; background: #f6f8fb; }
+    .anat-nivel.n1 { border-color: var(--accent-blue); background: #eef5ff; }
+    .anat-nivel.n2 { border-color: var(--green); background: var(--green-lt); margin-left: 24px; }
+    .anat-nivel.n3 { border-color: var(--orange); background: var(--orange-lt); margin-left: 48px; }
+    .anat-nivel b { color: var(--duoc-blue); }
+    .anat-nivel code { background: rgba(255,255,255,0.7); }
+    @media (max-width: 600px) { .anat-nivel.n2 { margin-left: 10px; } .anat-nivel.n3 { margin-left: 20px; } }
+
+    /* Demo interactiva */
+    .demo { border: 1.5px solid #dde4ee; border-radius: 6px; overflow: hidden; margin: 16px 0; }
+    .demo-bar { background: var(--duoc-blue); color: #fff; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 0.82rem; font-weight: 700; }
+    .demo-bar .tag { color: var(--duoc-yellow); text-transform: uppercase; letter-spacing: 1px; font-size: 0.72rem; }
+    .demo-botones { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 14px; background: #f6f8fb; border-bottom: 1px solid #e3e7ee; }
+    .demo-botones button { font-family: inherit; font-size: 0.85rem; font-weight: 700; padding: 8px 14px; border-radius: 4px; border: 1.5px solid var(--duoc-blue); background: #fff; color: var(--duoc-blue); cursor: pointer; }
+    .demo-botones button:hover { background: #eef5ff; }
+    .demo-botones button.primario { background: var(--duoc-yellow); border-color: var(--duoc-yellow); }
+    .demo-botones button.peligro { border-color: var(--red); color: var(--red); }
+    .demo-cuerpo { display: grid; grid-template-columns: 1fr 1fr; }
+    @media (max-width: 700px) { .demo-cuerpo { grid-template-columns: 1fr; } }
+    .demo-col { padding: 14px; min-width: 0; }
+    .demo-col + .demo-col { border-left: 1px solid #e3e7ee; }
+    @media (max-width: 700px) { .demo-col + .demo-col { border-left: none; border-top: 1px solid #e3e7ee; } }
+    .demo-col h4 code { text-transform: none; letter-spacing: 0; }
+    .demo-col h4 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; color: var(--mid-grey); margin-bottom: 8px; }
+    .demo-col pre { padding: 12px; font-size: 0.78rem; border-radius: 4px; }
+    .res-suite { font-weight: 800; color: var(--duoc-blue); margin-top: 8px; font-size: 0.92rem; }
+    .res-caso { padding: 4px 0 4px 18px; font-size: 0.88rem; border-bottom: 1px dashed #e3e7ee; }
+    .res-caso.ok::before { content: "✓ "; color: var(--green); font-weight: 900; }
+    .res-caso.fail::before { content: "✗ "; color: var(--red); font-weight: 900; }
+    .res-caso.fail { color: var(--red); }
+    .res-msg { display: block; font-family: 'Courier New', monospace; font-size: 0.78rem; color: var(--red); background: var(--red-lt); padding: 4px 8px; margin: 4px 0 2px; border-radius: 3px; }
+    .res-resumen { margin-top: 12px; padding: 10px 12px; border-radius: 4px; font-weight: 800; font-size: 0.9rem; }
+    .res-resumen.ok { background: var(--green-lt); color: var(--green); }
+    .res-resumen.fail { background: var(--red-lt); color: var(--red); }
+    .res-vacio { color: var(--mid-grey); font-size: 0.9rem; font-style: italic; }
+    .demo-estado { font-size: 0.78rem; margin-bottom: 6px; }
+    .demo-estado b.bug { color: var(--red); }
+    .demo-estado b.bien { color: var(--green); }
+
+    /* Diagrama de árbol de proyecto (mismo lenguaje visual que el de la Guía 02) */
+    .layout-diagram { border: 2px dashed #c7d0de; border-radius: 8px; padding: 14px; margin: 16px 0; background: #fafbfd; }
+    .ld-tag { display: inline-block; font-family: 'Courier New', monospace; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; color: var(--white); }
+    .ld-tag-root { background: var(--duoc-blue); }
+    .ld-tag-src { background: #b8890a; }
+    .ld-tag-carpeta { background: var(--orange); }
+    .ld-label { font-size: 0.82rem; color: var(--mid-grey); margin-bottom: 6px; }
+    .ld-root { background: #dceeff; border: 1.5px solid #7fb3e8; border-radius: 6px; padding: 10px 12px; }
+    .ld-src { background: #fef8e7; border: 1.5px solid var(--duoc-yellow); border-radius: 6px; padding: 10px 12px; margin-top: 8px; }
+    .ld-carpeta { background: var(--white); border: 1.5px dashed #d9b23b; border-radius: 4px; padding: 8px 10px; margin-top: 8px; }
+    .ld-fila { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+    .ld-arch { font-family: 'Courier New', monospace; font-size: 0.8rem; padding: 4px 10px; border-radius: 4px; border: 1.5px solid; background: var(--white); }
+    .ld-arch small { font-family: 'Segoe UI', Arial, sans-serif; font-size: 0.72rem; color: var(--mid-grey); }
+    .ld-cod { border-color: var(--accent-blue); color: var(--accent-blue); }
+    .ld-tst { border-color: var(--green); color: var(--green); background: var(--green-lt); font-weight: 700; }
+    .ld-conf { border-color: var(--orange); color: var(--orange); background: var(--orange-lt); }
+
+    /* Diagrama de flujo (mismo estilo que el de la Guía 1.2) */
+    .fichas-es { display: flex; align-items: stretch; justify-content: center; gap: 8px; margin: 16px 0; flex-wrap: wrap; }
+    .es-nodo { flex: 1 1 140px; min-width: 130px; background: #f6f8fb; border: 1.5px solid #dde4ee; border-radius: 6px; padding: 14px 12px; text-align: center; }
+    .es-nodo.es-activo { background: var(--green-lt); border-color: var(--green); }
+    .es-nodo .es-ico { font-size: 1.3rem; font-weight: 800; line-height: 1; display: block; margin-bottom: 6px; color: var(--duoc-blue); }
+    .es-nodo .es-titulo { font-weight: 800; color: var(--duoc-blue); font-size: 0.85rem; display: block; word-break: break-all; }
+    .es-nodo .es-sub { font-size: 0.76rem; color: var(--mid-grey); }
+    .es-flecha { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--mid-grey); font-weight: 700; font-size: 1.1rem; flex-shrink: 0; padding: 0 2px; }
+    .es-flecha small { display: block; font-size: 0.62rem; color: var(--accent-blue); text-align: center; line-height: 1.1; }
+  
+.card p code, .card li code { overflow-wrap: anywhere; }
+</style></head><body><div class="navbar"></div><header><div class="header-inner"><div class="header-badge-col"><span class="guia-num">19</span><span class="guia-label">Guía</span></div><div class="header-text"><span class="course-tag">DSY1104 · Desarrollo Fullstack II · 2026</span><h1>Conectar React con una API: <em>Axios y DTO</em></h1><div class="header-meta"><span><strong>Backend:</strong> Node.js y Express</span><span><strong>Frontend:</strong> React, Atomic Design y Bootstrap</span><span><strong>Modalidad:</strong> Demostración y práctica</span></div></div></div></header><div class="container"><div class="section-divider"><span class="num">0</span> Qué vas a construir</div><div class="card"><p>Vas a conectar una pantalla React con una API de productos. Al abrir la página, Axios consultará los productos. Al guardar un formulario, enviará sus datos al backend y mostrará el producto creado.</p><ul><li><a href="https://github.com/ProfeMike-sudo/dsy1104-productos-api-express">Backend: Node.js, Express y DTO</a>. Tiene CRUD completo y guarda productos en un archivo JSON.</li><li><a href="https://github.com/ProfeMike-sudo/dsy1104-productos-react-axios">Frontend: React, Axios y Bootstrap</a>. Permite guardar y listar, con Atomic Design y <code>props.algo</code>.</li></ul><p>Los repositorios son independientes. Este ejemplo usa productos ficticios, sin login ni JWT, para concentrarse en la comunicación. El archivo JSON conserva los datos entre reinicios en una sola instancia; no reemplaza la base de datos del trabajo semestral.</p></div><div class="section-divider"><span class="num">1</span> Qué hace Axios</div><div class="card"><p><strong>Axios es un cliente HTTP para JavaScript.</strong> En esta aplicación corre en el navegador: envía una solicitud a Express y recibe una respuesta. Express realiza la operación y devuelve JSON; React usa esos datos para actualizar la pantalla.</p><ol class="steps"><li>La persona abre la página o envía el formulario.</li><li>React llama a una función del service.</li><li>Axios envía GET o POST a la API.</li><li>Express valida, consulta o guarda y devuelve una respuesta HTTP.</li><li>React actualiza su estado y vuelve a dibujar la lista.</li></ol><p>Una llamada HTTP tarda y puede fallar. Axios devuelve una <strong>promesa</strong>; <code>await</code> espera su resultado dentro de una función <code>async</code>. <code>try/catch</code> permite mostrar un error si la solicitud falla.</p></div><div class="section-divider"><span class="num">2</span> Levantar los dos proyectos en EC2</div><div class="card"><p>Entra a la instancia usando Visual Studio Code. Necesitas Git, Node.js 24 LTS y npm. Si ya utilizas nvm, ejecuta <code>nvm install 24</code> y <code>nvm use 24</code>. Comprueba <code>node -v</code>. Usa dos terminales y dos carpetas separadas.</p><h3>2.1. Backend</h3><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">Terminal de EC2: backend</span></div><pre>git clone https://github.com/ProfeMike-sudo/dsy1104-productos-api-express.git
+cd dsy1104-productos-api-express
+npm ci
+cp .env.example .env</pre></div><p>Abre <code>.env</code> y configura el origen desde el cual abrirás el frontend:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">.env del backend</span></div><pre>PORT=3000
+HOST=0.0.0.0
+CORS_ORIGINS=http://IP_PUBLICA_FRONTEND:5173
+DATA_FILE=./data/productos.json</pre></div><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">Terminal del backend</span></div><pre>npm start</pre></div><h3>2.2. Frontend</h3><p>En otra terminal, vuelve a tu carpeta de trabajo antes de clonar. No clones el frontend dentro del backend.</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">Terminal de EC2: frontend</span></div><pre>git clone https://github.com/ProfeMike-sudo/dsy1104-productos-react-axios.git
+cd dsy1104-productos-react-axios
+npm ci
+cp .env.example .env</pre></div><p>Abre su <code>.env</code> y escribe la dirección del backend:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">.env del frontend</span></div><pre>VITE_API_URL=http://IP_PUBLICA_BACKEND:3000/api</pre></div><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">Terminal del frontend</span></div><pre>npm run dev</pre></div><p>Abre <code>http://IP_PUBLICA_FRONTEND:5173</code> en tu navegador. Si ambos proyectos están en la misma EC2, ambas direcciones usan la misma IP pública. En local usa <code>localhost</code> en lugar de las IP públicas.</p><div class="clave-box"><strong>La solicitud sale del navegador.</strong> En AWS, <code>localhost</code> escrito en la configuración de Axios apuntaría al computador que abre la página, no a EC2. Usa la IP pública del backend.</div><p>Permite TCP 5173 y 3000 en los grupos de seguridad correspondientes desde la IP pública de salida de tu computador. Mantén las dos terminales activas. Si cambias una dirección en <code>.env</code>, reinicia el proceso de ese proyecto.</p><p><code>npm ci</code> instala las versiones del archivo de bloqueo, incluyendo Axios y Bootstrap. El servidor de Vite se usa para esta demostración de desarrollo. Las variables <code>VITE_</code> son públicas: no contienen claves ni contraseñas.</p></div><div class="section-divider"><span class="num">3</span> Configurar Axios una sola vez</div><div class="card"><p>En un proyecto nuevo instalarías Axios con <code>npm install axios</code>. En este repositorio ya está declarado. Abre el archivo que crea su instancia:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">src/services/api.js</span></div><pre>import axios from &#x27;axios&#x27;;
+
+// Una instancia comparte dirección base y tiempo máximo entre solicitudes.
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || &#x27;http://localhost:3000/api&#x27;,
+  timeout: 10000
+});</pre></div><p><code>baseURL</code> es la dirección común. Al llamar <code>api.get('/productos')</code>, Axios usará <code>http://IP_PUBLICA_BACKEND:3000/api/productos</code>. <code>timeout</code> limita la espera a 10 segundos. Vite obtiene <code>VITE_API_URL</code> desde el archivo de entorno al iniciar o construir el proyecto.</p><p><strong>CORS:</strong> los puertos 5173 y 3000 son orígenes diferentes. Express permite el origen exacto configurado en <code>CORS_ORIGINS</code>. CORS controla lo que el navegador permite leer; no autentica usuarios ni reemplaza reglas de acceso.</p></div><div class="section-divider"><span class="num">4</span> Leer y guardar con un service</div><div class="card"><p>El service reúne las llamadas HTTP para que los componentes no repitan direcciones ni configuración:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">src/services/productoService.js: GET y POST</span></div><pre>import { api } from &#x27;./api.js&#x27;;
+
+export async function listarProductos(signal) {
+  const respuesta = await api.get(&#x27;/productos&#x27;, { signal: signal });
+  // data es el cuerpo JSON; status y headers pertenecen a la respuesta HTTP.
+  return respuesta.data;
+}
+
+export async function guardarProducto(dto) {
+  const respuesta = await api.post(&#x27;/productos&#x27;, dto);
+  return respuesta.data;
+}</pre></div><p><code>respuesta.data</code> contiene el cuerpo JSON. <code>respuesta.status</code> es el estado HTTP, por ejemplo 200 o 201. En POST, el segundo argumento es el objeto que Axios enviará como JSON.</p><p><code>signal</code> permite cancelar una lectura con <code>AbortController</code>. La página lo usa para no actualizar el estado con una solicitud que ya no necesita. No hace falta cancelar para comprender GET y POST, pero el ejemplo incluye la limpieza del efecto.</p><table class="ref-table"><thead><tr><th>Acción</th><th>Método en Axios</th><th>Uso en el ejemplo</th></tr></thead><tbody><tr><td>Listar</td><td><code>api.get('/productos')</code></td><td>Carga de la pantalla.</td></tr><tr><td>Crear</td><td><code>api.post('/productos', dto)</code></td><td>Formulario de nuevo producto.</td></tr><tr><td>Actualizar</td><td><code>api.put('/productos/ID', dto)</code></td><td>Disponible en la API; pruébalo desde Postman.</td></tr><tr><td>Eliminar</td><td><code>api.delete('/productos/ID')</code></td><td>Disponible en la API; responde 204 sin cuerpo.</td></tr></tbody></table></div><div class="section-divider"><span class="num">5</span> DTO: los datos que viajan</div><div class="card"><p><strong>DTO significa Data Transfer Object</strong>: un objeto con los campos que se transfieren entre partes del sistema. No es un componente React ni una tabla de base de datos. En este ejemplo, el cliente envía nombre, precio y stock; el servidor devuelve esos campos más el id.</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">src/dto/producto.dto.js</span></div><pre>// Los inputs HTML entregan texto. El contrato de la API exige números.
+export function crearProductoRequestDto(formulario) {
+  return {
+    nombre: formulario.nombre.trim(),
+    precio: Number(formulario.precio),
+    stock: Number(formulario.stock)
+  };
+}</pre></div><p>Los campos del formulario entregan texto. <code>Number()</code> convierte precio y stock a números. El formulario exige los tres campos; el backend vuelve a validarlos porque cualquier cliente puede enviar solicitudes sin pasar por React.</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">DTO de entrada: POST y PUT</span></div><pre>{ &quot;nombre&quot;: &quot;Cuaderno&quot;, &quot;precio&quot;: 2500, &quot;stock&quot;: 8 }</pre></div><p>El backend recibe JSON gracias a <code>express.json()</code>. Su DTO de entrada selecciona los campos admitidos y valida nombre, precio y stock. Los datos adicionales, como un id impuesto por el cliente, se descartan. El id se genera en el servidor.</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">src/dto/producto.dto.js</span></div><pre>import { HttpError } from &#x27;../errors/HttpError.js&#x27;;
+
+// DTO de entrada: valida y selecciona los únicos campos que acepta la API.
+// Se reutiliza en POST y PUT (PUT reemplaza los tres campos completos).
+export function crearProductoEntradaDto(cuerpo) {
+  if (!cuerpo || typeof cuerpo !== &#x27;object&#x27; || Array.isArray(cuerpo)) {
+    throw new HttpError(400, &#x27;Debes enviar un objeto JSON.&#x27;);
+  }
+  const errores = [];
+  const nombre = typeof cuerpo.nombre === &#x27;string&#x27; ? cuerpo.nombre.trim() : &#x27;&#x27;;
+  if (nombre.length &lt; 2 || nombre.length &gt; 80) {
+    errores.push(&#x27;El nombre debe tener entre 2 y 80 caracteres.&#x27;);
+  }
+  if (typeof cuerpo.precio !== &#x27;number&#x27; || !Number.isFinite(cuerpo.precio)
+      || cuerpo.precio &lt; 0 || cuerpo.precio &gt; 100000000) {
+    errores.push(&#x27;El precio debe ser un número entre 0 y 100000000.&#x27;);
+  }
+  if (!Number.isInteger(cuerpo.stock) || cuerpo.stock &lt; 0 || cuerpo.stock &gt; 1000000) {
+    errores.push(&#x27;El stock debe ser un entero entre 0 y 1000000.&#x27;);
+  }
+  if (errores.length) throw new HttpError(400, &#x27;Producto inválido.&#x27;, errores);
+
+  // No copiamos todo el cuerpo: id y fechaCreacion los controla el servidor.
+  return { nombre: nombre, precio: cuerpo.precio, stock: cuerpo.stock };
+}
+
+// DTO de salida: fechaCreacion queda en el almacenamiento, no en el contrato.
+export function crearProductoSalidaDto(producto) {
+  return {
+    id: producto.id,
+    nombre: producto.nombre,
+    precio: producto.precio,
+    stock: producto.stock
+  };
+}</pre></div><p>El archivo de almacenamiento contiene además <code>fechaCreacion</code>. El DTO de salida no la devuelve: muestra que el contrato puede ser distinto de la representación interna. Usar un DTO no valida automáticamente; las comprobaciones de la función realizan esa tarea.</p></div><div class="section-divider"><span class="num">6</span> React: Atomic Design y props.algo</div><div class="card"><table class="ref-table"><thead><tr><th>Nivel</th><th>Archivos</th><th>Responsabilidad</th></tr></thead><tbody><tr><td>Átomos</td><td>Boton, Etiqueta, Entrada</td><td>Controles básicos.</td></tr><tr><td>Moléculas</td><td>CampoFormulario, MensajeEstado, TarjetaProducto</td><td>Unidades de interfaz.</td></tr><tr><td>Organismos</td><td>FormularioProducto, ListaProductos</td><td>Formulario y lista.</td></tr><tr><td>Templates</td><td>ProductosTemplate</td><td>Distribución responsiva con Bootstrap.</td></tr><tr><td>Pages</td><td>ProductosPage</td><td>Estado, llamadas al service y errores.</td></tr></tbody></table><p>Los componentes acceden a las propiedades mediante <code>props.algo</code>. Por ejemplo, la lista entrega un producto a la tarjeta:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">src/components/organisms/ListaProductos.jsx</span></div><pre>import TarjetaProducto from &#x27;../molecules/TarjetaProducto.jsx&#x27;;
+
+export default function ListaProductos(props) {
+  if (props.cargando) return &lt;p role=&quot;status&quot;&gt;Cargando productos...&lt;/p&gt;;
+  if (props.error) return &lt;p&gt;La lista no está disponible. Usa el botón para reintentar.&lt;/p&gt;;
+  if (props.productos.length === 0) return &lt;p className=&quot;text-body-secondary&quot;&gt;Todavía no hay productos. Guarda el primero.&lt;/p&gt;;
+  return (
+    &lt;div className=&quot;row g-3&quot;&gt;
+      {props.productos.map(function (producto) {
+        return &lt;div className=&quot;col-12 col-md-6&quot; key={producto.id}&gt;&lt;TarjetaProducto producto={producto} /&gt;&lt;/div&gt;;
+      })}
+    &lt;/div&gt;
+  );
+}</pre></div><p>La tarjeta lee <code>props.producto.nombre</code>, <code>props.producto.precio</code> y <code>props.producto.stock</code>. <code>map()</code> transforma los productos en elementos React y <code>key</code> identifica cada uno por su id. Las clases de Bootstrap organizan las tarjetas en columnas.</p><p>En el formulario, <code>props.alGuardar(dto)</code> llama a la función que recibió desde la página. La página ejecuta el POST y actualiza el estado con el producto devuelto:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">src/pages/ProductosPage.jsx: crearProducto</span></div><pre>async function crearProducto(dto) {
+    setGuardando(true);
+    setErrorGuardado(&#x27;&#x27;);
+    setExito(&#x27;&#x27;);
+    try {
+      const creado = await guardarProducto(dto);
+      // Usamos el DTO de respuesta: su id lo asignó el backend.
+      setProductos(function (anteriores) { return anteriores.concat(creado); });
+      setExito(&#x27;Producto guardado correctamente.&#x27;);
+      return true;
+    } catch (error) {
+      setErrorGuardado(obtenerMensajeError(error));
+      return false;
+    } finally {
+      setGuardando(false);
+    }
+  }</pre></div><p><code>setProductos</code> agrega el resultado del backend sin recargar toda la página. <code>finally</code> termina el estado de guardado tanto si hay éxito como si hay error. El formulario limpia sus campos solo cuando <code>props.alGuardar</code> devuelve <code>true</code>.</p><p>El uso de <code>const [nombre, setNombre] = useState('')</code> desestructura el resultado de un hook; no desestructura las props. Las llamadas HTTP y los DTO quedan fuera de los átomos, en <code>services/</code> y <code>dto/</code>.</p></div><div class="section-divider"><span class="num">7</span> Errores: HTTP, red y CORS</div><div class="card"><p>Axios, con su configuración predeterminada, rechaza la promesa ante estados HTTP fuera de 200 a 299. No todos los errores son iguales:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">src/services/productoService.js: errores</span></div><pre>export function obtenerMensajeError(error) {
+  if (error.response) {
+    // Hubo respuesta HTTP: por ejemplo, 400 con errores del DTO de entrada.
+    const datos = error.response.data;
+    if (datos &amp;&amp; typeof datos.mensaje === &#x27;string&#x27;) {
+      const detalles = Array.isArray(datos.detalles) ? datos.detalles.join(&#x27; &#x27;) : &#x27;&#x27;;
+      return datos.mensaje + (detalles ? &#x27; &#x27; + detalles : &#x27;&#x27;);
+    }
+    return &#x27;La API respondió con un error (&#x27; + error.response.status + &#x27;).&#x27;;
+  }
+  if (error.code === &#x27;ECONNABORTED&#x27;) return &#x27;La API tardó demasiado. Revisa su estado antes de volver a guardar.&#x27;;
+  // El navegador no permite distinguir aquí entre CORS, red y servidor detenido.
+  return &#x27;No fue posible contactar la API. Revisa la conexión, su dirección y CORS.&#x27;;
+}</pre></div><p>La pantalla muestra mensajes dentro de la página, sin <code>alert()</code>. Si falla el guardado, conserva los campos. Un timeout no asegura que el servidor no haya guardado: actualiza la lista antes de volver a enviar para evitar duplicados.</p><table class="ref-table"><thead><tr><th>Síntoma</th><th>Qué revisar</th></tr></thead><tbody><tr><td>No aparece la lista</td><td>API encendida, IP y puerto 3000, VITE_API_URL y grupo de seguridad.</td></tr><tr><td>Funciona en Postman, pero no en React</td><td>Origen exacto de CORS y consola del navegador. El puerto también forma parte del origen.</td></tr><tr><td>400 al guardar</td><td>Cuerpo JSON y tipos del DTO; precio numérico y stock entero no negativos.</td></tr><tr><td>404</td><td>Ruta completa con /api/productos e id existente.</td></tr><tr><td>La URL vieja sigue usándose</td><td>Reinicia Vite después de cambiar .env. Para un build, vuelve a construir.</td></tr><tr><td>Página HTTPS con API HTTP</td><td>El navegador puede bloquear contenido mixto; utiliza protocolos compatibles.</td></tr></tbody></table></div><div class="section-divider"><span class="num">8</span> Recorrido de prueba para la clase</div><div class="card"><ol class="steps"><li>Abre la pantalla y las herramientas del navegador. En <strong>Network</strong> filtra por Fetch/XHR y busca <code>productos</code>.</li><li>Guarda un Cuaderno con precio 2500 y stock 8. Revisa el POST: URL, cuerpo enviado y respuesta <strong>201</strong> con id.</li><li>Presiona <strong>Actualizar lista</strong>. Revisa el GET, estado <strong>200</strong> y arreglo de productos.</li><li>Recarga el navegador: el producto vuelve a consultarse desde el backend, no desde localStorage.</li><li>Importa la colección Postman incluida en el backend. Ajusta <code>baseUrl</code>, crea un producto y prueba GET por id, PUT y DELETE. La colección guarda automáticamente el id creado.</li><li>Envía desde Postman un precio negativo y observa <strong>400</strong>. Comprueba que no aparece en la lista.</li><li>Detén la API y actualiza la lista. Lee el error; vuelve a iniciar la API y presiona <strong>Reintentar carga</strong>.</li></ol><p>Si React StrictMode inicia y cancela una primera lectura en desarrollo, observa el GET que se completa. No implica que se haya enviado dos veces el formulario.</p></div><div class="section-divider"><span class="num">9</span> Cierre y ejercicio</div><div class="card"><p>Explica el recorrido desde <code>props.alGuardar(dto)</code> hasta el DTO que responde Express. Identifica dónde se valida, dónde se almacena y dónde cambia el estado de React.</p><p>Luego agrega al frontend una acción para eliminar un producto usando el DELETE que ya existe. Mantén Axios en el service, usa <code>props.algo</code>, muestra errores en la página y actualiza la lista después de una respuesta exitosa. Recuerda que 204 no devuelve un producto.</p><p>Para revisar los proyectos: ejecuta <code>npm test</code> en cada repositorio y <code>npm run build</code> en el frontend. Al terminar la demostración, detén los procesos con Ctrl+C y gestiona la instancia según las indicaciones del laboratorio.</p><p>Referencias: <a href="https://axios-http.com/docs/intro">Axios</a>, <a href="https://axios-http.com/docs/handling_errors">errores en Axios</a>, <a href="https://expressjs.com/en/5x/api.html">Express</a> y <a href="https://vite.dev/guide/env-and-mode">variables de entorno de Vite</a>.</p></div></div><footer><strong>DSY1104 · Desarrollo Fullstack II</strong> · Duoc UC · Guía N°19</footer></body></html>

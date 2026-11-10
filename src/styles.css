@@ -1,0 +1,8 @@
+body { background: #f1f5f9; color: #16324b; }
+.encabezado { background: #002d56; color: #fff; border-bottom: 4px solid #ffc20e; }
+.curso { color: #ffc20e; font-weight: 700; letter-spacing: .06em; font-size: .85rem; }
+.panel { background: #fff; border: 1px solid #dce4ed; border-radius: 12px; }
+.producto-card { border-color: #dce4ed; }
+.precio { font-size: 1.2rem; font-weight: 700; color: #0056b3; }
+.btn-primary { --bs-btn-bg: #0056b3; --bs-btn-border-color: #0056b3; }
+.form-label { font-weight: 600; }
