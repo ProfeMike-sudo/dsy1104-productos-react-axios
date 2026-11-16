@@ -4,5 +4,5 @@ export function crearProductoRequestDto(formulario) {
     nombre: formulario.nombre.trim(),
     precio: Number(formulario.precio),
     stock: Number(formulario.stock)
-  };
+  }
 }

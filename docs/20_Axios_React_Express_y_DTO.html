@@ -1,0 +1,755 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Guía 20 · Axios, React, API y DTO | DSY1104</title><style>
+    :root {
+      --duoc-blue:   #002d56;
+      --duoc-yellow: #ffc20e;
+      --accent-blue: #0056b3;
+      --dark-grey:   #333333;
+      --mid-grey:    #555555;
+      --white:       #ffffff;
+      --green:       #1a6b3c;
+      --green-lt:    #e6f4ec;
+      --orange:      #b84b00;
+      --orange-lt:   #fdf0e6;
+      --red:         #a3242f;
+      --red-lt:      #fbe9ea;
+      --code-bg:     #0d1117;
+      --code-text:   #e6edf3;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #e9ecef; color: var(--dark-grey); line-height: 1.8; }
+    .navbar { background: var(--duoc-blue); height: 10px; }
+    header { background: var(--white); border-bottom: 4px solid var(--duoc-yellow); box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+    .header-inner { max-width: 1000px; margin: 0 auto; display: flex; align-items: stretch; min-height: 140px; }
+    .header-badge-col { background: var(--duoc-blue); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 28px; flex-shrink: 0; gap: 6px; }
+    .header-badge-col .guia-num { font-size: 2.1rem; font-weight: 900; color: var(--duoc-yellow); line-height: 1; letter-spacing: 1px; }
+    .header-badge-col .guia-label { font-size: 0.68rem; color: rgba(255,255,255,0.65); text-transform: uppercase; letter-spacing: 2px; font-weight: 600; text-align: center; }
+    .header-text { padding: 28px 32px; display: flex; flex-direction: column; justify-content: center; }
+    .header-text .course-tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-blue); font-weight: 700; margin-bottom: 6px; }
+    .header-text h1 { color: var(--duoc-blue); font-size: 1.6rem; font-weight: 800; line-height: 1.25; margin-bottom: 8px; }
+    .header-text h1 em { font-style: normal; color: var(--accent-blue); }
+    .header-meta { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 4px; }
+    .header-meta span { font-size: 0.82rem; color: var(--mid-grey); }
+    .header-meta span strong { color: var(--duoc-blue); }
+    @media (max-width: 600px) {
+      .header-badge-col { padding: 18px 16px; }
+      .header-text { padding: 20px 16px; }
+      .header-text h1 { font-size: 1.25rem; }
+    }
+    .container { max-width: 1000px; margin: 32px auto; padding: 0 20px 60px; }
+    .section-divider { background: var(--duoc-blue); color: var(--duoc-yellow); padding: 12px 20px; font-size: 0.9rem; font-weight: 700; border-radius: 4px; margin: 36px 0 18px; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+    .section-divider .num { background: var(--duoc-yellow); color: var(--duoc-blue); border-radius: 3px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 900; flex-shrink: 0; }
+    .card { background: var(--white); border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.09); padding: 32px 36px; margin-bottom: 20px; }
+    @media (max-width: 600px) { .card { padding: 20px 16px; } }
+    .card h2 { color: var(--duoc-blue); border-left: 5px solid var(--duoc-yellow); padding-left: 14px; font-size: 1.25rem; margin-bottom: 16px; }
+    .card h3 { color: var(--accent-blue); font-size: 1.05rem; margin: 24px 0 10px; }
+    .card p { margin-bottom: 12px; font-size: 1rem; }
+    .card p:last-child { margin-bottom: 0; }
+    .card ul, .card ol { padding-left: 22px; font-size: 1rem; line-height: 1.85; }
+    .card li { margin-bottom: 4px; }
+    .info-box { background: #e7f3ff; border-left: 5px solid var(--accent-blue); padding: 14px 18px; border-radius: 0 4px 4px 0; margin: 16px 0; font-size: 0.97rem; }
+    .info-box strong { color: var(--duoc-blue); }
+    .warn-box { background: var(--red-lt); border-left: 5px solid var(--red); padding: 14px 18px; border-radius: 0 4px 4px 0; margin: 16px 0; font-size: 0.97rem; }
+    .warn-box strong { color: var(--red); }
+    .clave-box { background: var(--orange-lt); border-left: 5px solid var(--orange); padding: 14px 18px; border-radius: 0 4px 4px 0; margin: 16px 0; font-size: 0.97rem; }
+    .clave-box strong { color: var(--orange); }
+    .ok-box { background: var(--green-lt); border-left: 5px solid var(--green); padding: 14px 18px; border-radius: 0 4px 4px 0; margin: 16px 0; font-size: 0.97rem; }
+    .ok-box strong { color: var(--green); }
+    .badge { display: inline-block; font-size: 0.72rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border-radius: 3px; margin-bottom: 14px; }
+    .badge-todos { background: var(--orange-lt); color: var(--orange); border: 1.5px solid #f0c9a8; }
+    .badge-eq { background: var(--green-lt); color: var(--green); border: 1.5px solid #9ad9c0; }
+    .steps { list-style: none; margin: 14px 0; padding: 0; counter-reset: step; }
+    .steps li { position: relative; padding-left: 36px; margin-bottom: 14px; counter-increment: step; font-size: 0.97rem; }
+    .steps li::before { content: counter(step); position: absolute; left: 0; top: 1px; width: 24px; height: 24px; background: var(--duoc-yellow); color: var(--duoc-blue); border-radius: 50%; font-weight: 900; font-size: 0.78rem; display: flex; align-items: center; justify-content: center; }
+    .steps li strong { color: var(--duoc-blue); }
+    code { font-family: 'Courier New', monospace; background: #eef0f4; padding: 1px 5px; border-radius: 3px; font-size: 0.87em; color: var(--duoc-blue); }
+    .ref-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9rem; }
+    .ref-table th { background: var(--duoc-blue); color: var(--white); text-align: left; padding: 10px 12px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .ref-table td { padding: 10px 12px; border-bottom: 1px solid #e3e7ee; vertical-align: top; }
+    .ref-table tr:nth-child(even) td { background: #f6f8fb; }
+    @media (max-width: 600px) { .ref-table { display: block; overflow-x: auto; } }
+    footer { background: var(--duoc-blue); color: rgba(255,255,255,0.5); text-align: center; padding: 18px; font-size: 0.82rem; margin-top: 40px; }
+    footer strong { color: var(--duoc-yellow); }
+    .code-wrap { border-radius: 6px; overflow: hidden; margin: 16px 0; border: 1px solid #30363d; }
+    .code-header { background: #161b22; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #30363d; }
+    .code-header .dots { display: flex; gap: 5px; }
+    .code-header .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; } .dot-y { background: #febc2e; } .dot-g { background: #28c840; }
+    .code-header .lang { font-family: 'Courier New', monospace; font-size: 0.72rem; color: #8b949e; letter-spacing: 0.5px; }
+    pre { background: var(--code-bg); padding: 20px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.65; color: var(--code-text); }
+    .t-ok { color: #7ee787; } .t-bad { color: #ff7b72; } .t-dim { color: #8b949e; }
+    /* Anatomía de una prueba */
+    .anatomia { display: grid; gap: 10px; margin: 16px 0; }
+    .anat-nivel { border: 1.5px solid #dde4ee; border-radius: 6px; padding: 12px 16px; background: #f6f8fb; }
+    .anat-nivel.n1 { border-color: var(--accent-blue); background: #eef5ff; }
+    .anat-nivel.n2 { border-color: var(--green); background: var(--green-lt); margin-left: 24px; }
+    .anat-nivel.n3 { border-color: var(--orange); background: var(--orange-lt); margin-left: 48px; }
+    .anat-nivel b { color: var(--duoc-blue); }
+    .anat-nivel code { background: rgba(255,255,255,0.7); }
+    @media (max-width: 600px) { .anat-nivel.n2 { margin-left: 10px; } .anat-nivel.n3 { margin-left: 20px; } }
+
+    /* Demo interactiva */
+    .demo { border: 1.5px solid #dde4ee; border-radius: 6px; overflow: hidden; margin: 16px 0; }
+    .demo-bar { background: var(--duoc-blue); color: #fff; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 0.82rem; font-weight: 700; }
+    .demo-bar .tag { color: var(--duoc-yellow); text-transform: uppercase; letter-spacing: 1px; font-size: 0.72rem; }
+    .demo-botones { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 14px; background: #f6f8fb; border-bottom: 1px solid #e3e7ee; }
+    .demo-botones button { font-family: inherit; font-size: 0.85rem; font-weight: 700; padding: 8px 14px; border-radius: 4px; border: 1.5px solid var(--duoc-blue); background: #fff; color: var(--duoc-blue); cursor: pointer; }
+    .demo-botones button:hover { background: #eef5ff; }
+    .demo-botones button.primario { background: var(--duoc-yellow); border-color: var(--duoc-yellow); }
+    .demo-botones button.peligro { border-color: var(--red); color: var(--red); }
+    .demo-cuerpo { display: grid; grid-template-columns: 1fr 1fr; }
+    @media (max-width: 700px) { .demo-cuerpo { grid-template-columns: 1fr; } }
+    .demo-col { padding: 14px; min-width: 0; }
+    .demo-col + .demo-col { border-left: 1px solid #e3e7ee; }
+    @media (max-width: 700px) { .demo-col + .demo-col { border-left: none; border-top: 1px solid #e3e7ee; } }
+    .demo-col h4 code { text-transform: none; letter-spacing: 0; }
+    .demo-col h4 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; color: var(--mid-grey); margin-bottom: 8px; }
+    .demo-col pre { padding: 12px; font-size: 0.78rem; border-radius: 4px; }
+    .res-suite { font-weight: 800; color: var(--duoc-blue); margin-top: 8px; font-size: 0.92rem; }
+    .res-caso { padding: 4px 0 4px 18px; font-size: 0.88rem; border-bottom: 1px dashed #e3e7ee; }
+    .res-caso.ok::before { content: "✓ "; color: var(--green); font-weight: 900; }
+    .res-caso.fail::before { content: "✗ "; color: var(--red); font-weight: 900; }
+    .res-caso.fail { color: var(--red); }
+    .res-msg { display: block; font-family: 'Courier New', monospace; font-size: 0.78rem; color: var(--red); background: var(--red-lt); padding: 4px 8px; margin: 4px 0 2px; border-radius: 3px; }
+    .res-resumen { margin-top: 12px; padding: 10px 12px; border-radius: 4px; font-weight: 800; font-size: 0.9rem; }
+    .res-resumen.ok { background: var(--green-lt); color: var(--green); }
+    .res-resumen.fail { background: var(--red-lt); color: var(--red); }
+    .res-vacio { color: var(--mid-grey); font-size: 0.9rem; font-style: italic; }
+    .demo-estado { font-size: 0.78rem; margin-bottom: 6px; }
+    .demo-estado b.bug { color: var(--red); }
+    .demo-estado b.bien { color: var(--green); }
+
+    /* Diagrama de árbol de proyecto (mismo lenguaje visual que el de la Guía 02) */
+    .layout-diagram { border: 2px dashed #c7d0de; border-radius: 8px; padding: 14px; margin: 16px 0; background: #fafbfd; }
+    .ld-tag { display: inline-block; font-family: 'Courier New', monospace; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; color: var(--white); }
+    .ld-tag-root { background: var(--duoc-blue); }
+    .ld-tag-src { background: #b8890a; }
+    .ld-tag-carpeta { background: var(--orange); }
+    .ld-label { font-size: 0.82rem; color: var(--mid-grey); margin-bottom: 6px; }
+    .ld-root { background: #dceeff; border: 1.5px solid #7fb3e8; border-radius: 6px; padding: 10px 12px; }
+    .ld-src { background: #fef8e7; border: 1.5px solid var(--duoc-yellow); border-radius: 6px; padding: 10px 12px; margin-top: 8px; }
+    .ld-carpeta { background: var(--white); border: 1.5px dashed #d9b23b; border-radius: 4px; padding: 8px 10px; margin-top: 8px; }
+    .ld-fila { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+    .ld-arch { font-family: 'Courier New', monospace; font-size: 0.8rem; padding: 4px 10px; border-radius: 4px; border: 1.5px solid; background: var(--white); }
+    .ld-arch small { font-family: 'Segoe UI', Arial, sans-serif; font-size: 0.72rem; color: var(--mid-grey); }
+    .ld-cod { border-color: var(--accent-blue); color: var(--accent-blue); }
+    .ld-tst { border-color: var(--green); color: var(--green); background: var(--green-lt); font-weight: 700; }
+    .ld-conf { border-color: var(--orange); color: var(--orange); background: var(--orange-lt); }
+
+    /* Diagrama de flujo (mismo estilo que el de la Guía 1.2) */
+    .fichas-es { display: flex; align-items: stretch; justify-content: center; gap: 8px; margin: 16px 0; flex-wrap: wrap; }
+    .es-nodo { flex: 1 1 140px; min-width: 130px; background: #f6f8fb; border: 1.5px solid #dde4ee; border-radius: 6px; padding: 14px 12px; text-align: center; }
+    .es-nodo.es-activo { background: var(--green-lt); border-color: var(--green); }
+    .es-nodo .es-ico { font-size: 1.3rem; font-weight: 800; line-height: 1; display: block; margin-bottom: 6px; color: var(--duoc-blue); }
+    .es-nodo .es-titulo { font-weight: 800; color: var(--duoc-blue); font-size: 0.85rem; display: block; word-break: break-all; }
+    .es-nodo .es-sub { font-size: 0.76rem; color: var(--mid-grey); }
+    .es-flecha { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--mid-grey); font-weight: 700; font-size: 1.1rem; flex-shrink: 0; padding: 0 2px; }
+    .es-flecha small { display: block; font-size: 0.62rem; color: var(--accent-blue); text-align: center; line-height: 1.1; }
+  
+.card p code, .card li code { overflow-wrap: anywhere; }
+
+/* ══ DIAGRAMAS ARCHIFY (dataflow/sequence/etc.), mapeados a la paleta Duoc ══ */
+.diagrama-archify { background: var(--white); border-radius: 6px; padding: 14px; margin: 16px 0; overflow-x: auto; }
+.diagrama-archify svg { width: 100%; height: auto; display: block; font-family: 'Segoe UI', Arial, sans-serif; min-width: 640px; }
+.diagrama-archify .c-lane { fill: #f6f8fb; stroke: #dde4ee; }
+.diagrama-archify .c-grid { fill: none; stroke: #e2e6eb; }
+.diagrama-archify .c-mask { fill: var(--white); }
+.diagrama-archify .c-database { fill: var(--green-lt); stroke: var(--green); }
+.diagrama-archify .c-frontend { fill: #e7f3ff; stroke: var(--accent-blue); }
+.diagrama-archify .c-backend { fill: #eef0f4; stroke: var(--mid-grey); }
+.diagrama-archify .c-external { fill: var(--orange-lt); stroke: var(--orange); }
+.diagrama-archify .a-default { fill: none; stroke: #94a3b8; }
+.diagrama-archify .m-default { fill: #94a3b8; stroke: #94a3b8; }
+.diagrama-archify .a-emphasis { fill: none; stroke: var(--accent-blue); }
+.diagrama-archify .m-emphasis { fill: var(--accent-blue); stroke: var(--accent-blue); }
+.diagrama-archify .a-security { fill: none; stroke: var(--green); }
+.diagrama-archify .m-security { fill: var(--green); stroke: var(--green); }
+.diagrama-archify .a-dashed { fill: none; stroke: var(--orange); }
+.diagrama-archify .m-dashed { fill: var(--orange); stroke: var(--orange); }
+.diagrama-archify .semantic-sigil { fill: none; stroke: currentColor; stroke-width: 1.1; }
+.diagrama-archify .s-database { color: var(--green); }
+.diagrama-archify .s-frontend { color: var(--accent-blue); }
+.diagrama-archify .s-backend { color: var(--mid-grey); }
+.diagrama-archify .s-external { color: var(--orange); }
+.diagrama-archify .sigil-fill { fill: currentColor; stroke: none; }
+.diagrama-archify .t-primary { fill: var(--duoc-blue); }
+.diagrama-archify .t-muted { fill: var(--mid-grey); }
+.diagrama-archify .t-dim { fill: #94a3b8; }
+.diagrama-archify .t-edge-default { fill: #6b7a8f; }
+.diagrama-archify .t-edge-emphasis { fill: var(--accent-blue); font-weight: 600; }
+.diagrama-archify .t-edge-security { fill: var(--green); font-weight: 600; }
+.diagrama-archify .diagrama-caption { font-size: 0.8rem; color: var(--mid-grey); font-style: italic; text-align: center; margin-top: 6px; }
+.diagrama-archify .c-region { fill: rgba(0, 48, 92, 0.04); stroke: #94a3b8; }
+.diagrama-archify .t-cloud { fill: var(--duoc-blue); }
+
+</style></head><body><div class="navbar"></div><header><div class="header-inner"><div class="header-badge-col"><span class="guia-num">20</span><span class="guia-label">Guía</span></div><div class="header-text"><span class="course-tag">DSY1104 · Desarrollo Fullstack II · 2026</span><h1>Conectar React con una API: <em>Axios y DTO</em></h1><div class="header-meta"><span><strong>Backend:</strong> Express o Spring Boot</span><span><strong>Frontend:</strong> React, Atomic Design y Bootstrap</span><span><strong>Modalidad:</strong> Demostración y práctica</span></div></div></div></header><div class="container"><div class="section-divider"><span class="num">0</span> Qué vas a lograr</div><div class="card"><p>Al terminar esta guía, una pantalla React le habrá pedido productos a una API y le habrá enviado uno nuevo desde un formulario, todo con Axios. Vas a levantar el ejemplo, leer cada pieza del código y seguir un producto desde que lo escribes hasta que queda guardado.</p><p>El ejemplo tiene dos partes que se ejecutan por separado. Del backend hay dos versiones con el mismo contrato, y puedes elegir la que tu equipo usará en el proyecto semestral:</p><ul><li><a href="https://github.com/ProfeMike-sudo/dsy1104-productos-api-express">Backend con Node.js y Express</a>. Guarda los productos en un archivo JSON.</li><li><a href="https://github.com/ProfeMike-sudo/dsy1104-productos-api-springboot">Backend con Spring Boot</a>. Usa JPA y una base H2 que vive en un archivo.</li><li><a href="https://github.com/ProfeMike-sudo/dsy1104-productos-react-axios">Frontend con React, Axios y React Bootstrap</a>. Guarda y lista productos, con Atomic Design y <code>props.algo</code>. Funciona igual con cualquiera de los dos backends.</li></ul><h3>Lo que necesitas instalado</h3><table class="ref-table"><thead><tr><th>Proyecto</th><th>Requisito</th><th>Cómo comprobarlo</th></tr></thead><tbody><tr><td>Frontend y backend Express</td><td>Node.js 24</td><td><code>node -v</code>. Si ves una versión menor, instala la 24 con <code>nvm install 24</code>. La versión que instala <code>apt</code> en la guía 18 puede ser más antigua.</td></tr><tr><td>Backend Spring Boot</td><td>Java 21 o superior</td><td><code>java -version</code>. El proyecto trae <code>mvnw</code>, así que no instalas Maven.</td></tr><tr><td>Todos</td><td>Git</td><td><code>git --version</code></td></tr></tbody></table><p>El ejemplo usa productos ficticios y no tiene login ni JWT, para que la atención quede en la comunicación entre React y la API. Tampoco reemplaza la base de datos de tu proyecto: guarda en un archivo y funciona con un solo proceso. Es la versión pequeña de lo que planificaron en la guía 19, con funciones de <code>services/</code> que consultan una API.</p></div><div class="section-divider"><span class="num">1</span> Cómo se conectan las piezas</div><div class="card"><p>Axios es un cliente HTTP para JavaScript. En esta aplicación corre en el navegador: envía una solicitud al backend y espera una respuesta. El diagrama muestra el camino completo.</p><div class="diagrama-archify"><svg viewBox="0 0 1090 348" role="img" lang="es" aria-labelledby="d-recorrido-axios-archify-diagram-title d-recorrido-axios-archify-diagram-description" data-animation="trace" data-preset="classic" data-quality-profile="showcase" data-node-ui="" data-reader-fit="intrinsic-height" data-reader-min-text="7.5" data-reader-primary-text="14">
+        <title id="d-recorrido-axios-archify-diagram-title">El recorrido de una solicitud</title>
+        <desc id="d-recorrido-axios-archify-diagram-description">Un diagrama de arquitectura generado por Archify.</desc>
+        <!-- Definitions -->
+        <defs>
+          <marker id="d-recorrido-axios-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-default" />
+          </marker>
+          <marker id="d-recorrido-axios-arrowhead-emphasis" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-emphasis" />
+          </marker>
+          <marker id="d-recorrido-axios-arrowhead-security" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-security" />
+          </marker>
+          <marker id="d-recorrido-axios-arrowhead-dashed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-dashed" />
+          </marker>
+          <pattern id="d-recorrido-axios-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" class="c-grid" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        
+
+        <!-- Background Grid -->
+        <rect width="100%" height="100%" fill="url(#d-recorrido-axios-grid)" />
+
+        <!-- Boundaries (behind everything) -->
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="0" data-composition-frame-label="Navegador · React en :5173" x="20" y="60" width="370" height="110" rx="12" class="c-region" stroke-width="1"/>
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="1" data-composition-frame-label="Servidor · API en :3000" x="490" y="60" width="560" height="220" rx="12" class="c-region" stroke-width="1"/>
+
+        <!-- Connection paths (before components for correct z-order) -->
+        <g data-graph-role="automatic-crossover" style="--step:0">
+          <path data-graph-role="automatic-crossover-underlay" d="M 180 120 L 220 120" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="pagina" data-edge-to="axios" data-edge-key="0" data-edge-id="c1" data-composition-points="180,120;220,120" data-composition-crossover="halo" data-composition-independent="true" d="M 180 120 L 220 120" class="a-default" data-animate="edge" style="--step:0" stroke-width="1.5" marker-end="url(#d-recorrido-axios-arrowhead)"/>
+        </g>
+        <g data-graph-role="automatic-crossover" style="--step:1">
+          <path data-graph-role="automatic-crossover-underlay" d="M 360 120 L 520 120" fill="none" stroke="var(--mask)" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="axios" data-edge-to="express" data-edge-label="HTTP + JSON" data-edge-key="1" data-edge-id="c2" data-composition-points="360,120;520,120" data-composition-crossover="halo" data-composition-independent="true" d="M 360 120 L 520 120" class="a-emphasis" data-animate="edge" style="--step:1" stroke-width="1.8" marker-end="url(#d-recorrido-axios-arrowhead-emphasis)"/>
+        </g>
+        <g data-graph-role="automatic-crossover" style="--step:2">
+          <path data-graph-role="automatic-crossover-underlay" d="M 680 120 L 720 120" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="express" data-edge-to="logica" data-edge-key="2" data-edge-id="c3" data-composition-points="680,120;720,120" data-composition-crossover="halo" data-composition-independent="true" d="M 680 120 L 720 120" class="a-default" data-animate="edge" style="--step:2" stroke-width="1.5" marker-end="url(#d-recorrido-axios-arrowhead)"/>
+        </g>
+        <g data-graph-role="automatic-crossover" style="--step:3">
+          <path data-graph-role="automatic-crossover-underlay" d="M 850 134 L 898 134 Q 906 134 906 142 L 906 200" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="logica" data-edge-to="json" data-edge-label="lee o escribe" data-edge-key="3" data-edge-id="c4" data-composition-points="850,134;906,134;906,200" data-composition-crossover="halo" data-composition-independent="true" d="M 850 134 L 898 134 Q 906 134 906 142 L 906 200" class="a-default" data-animate="edge" style="--step:3" stroke-width="1.5" marker-end="url(#d-recorrido-axios-arrowhead)"/>
+        </g>
+
+        <!-- Components -->
+        <g id="d-recorrido-axios-node-pagina" data-node-id="pagina" data-node-label="ProductosPage" tabindex="0" role="button" aria-label="Enfocar ProductosPage, estado y errores, Navegador · React en :5173" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="estado y errores" data-node-context="Navegador · React en :5173">
+          <title>ProductosPage · estado y errores · Navegador · React en :5173</title>
+          <rect x="50" y="90" width="130" height="60" rx="8" class="c-mask"/>
+          <rect x="50" y="90" width="130" height="60" rx="8" class="c-frontend" data-animate="node" style="--step:0" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(56 96) scale(0.6875)">
+            <rect x="2" y="3" width="12" height="10" rx="2"/>
+            <path d="M2 6.5h12"/>
+            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
+            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="115" y="118" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">ProductosPage</text>
+        <text data-detail="context" x="115" y="134" class="t-muted" font-size="9" text-anchor="middle">estado y errores</text>
+        </g>
+
+        <g id="d-recorrido-axios-node-axios" data-node-id="axios" data-node-label="productoService" tabindex="0" role="button" aria-label="Enfocar productoService, Axios: get y post, Navegador · React en :5173" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="Axios: get y post" data-node-context="Navegador · React en :5173">
+          <title>productoService · Axios: get y post · Navegador · React en :5173</title>
+          <rect x="220" y="90" width="140" height="60" rx="8" class="c-mask"/>
+          <rect x="220" y="90" width="140" height="60" rx="8" class="c-frontend" data-animate="node" style="--step:1" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(226 96) scale(0.6875)">
+            <rect x="2" y="3" width="12" height="10" rx="2"/>
+            <path d="M2 6.5h12"/>
+            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
+            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="290" y="118" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">productoService</text>
+        <text data-detail="context" x="290" y="134" class="t-muted" font-size="9" text-anchor="middle">Axios: get y post</text>
+        </g>
+
+        <g id="d-recorrido-axios-node-express" data-node-id="express" data-node-label="Rutas y DTO" tabindex="0" role="button" aria-label="Enfocar Rutas y DTO, Express o Spring Boot, Servidor · API en :3000" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Express o Spring Boot" data-node-context="Servidor · API en :3000">
+          <title>Rutas y DTO · Express o Spring Boot · Servidor · API en :3000</title>
+          <rect x="520" y="90" width="160" height="60" rx="8" class="c-mask"/>
+          <rect x="520" y="90" width="160" height="60" rx="8" class="c-backend" data-animate="node" style="--step:2" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(526 96) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="600" y="118" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Rutas y DTO</text>
+        <text data-detail="context" x="600" y="134" class="t-muted" font-size="9" text-anchor="middle">Express o Spring Boot</text>
+        </g>
+
+        <g id="d-recorrido-axios-node-logica" data-node-id="logica" data-node-label="service" tabindex="0" role="button" aria-label="Enfocar service, reglas del producto, Servidor · API en :3000" aria-pressed="false" data-node-kind="backend" data-node-sublabel="reglas del producto" data-node-context="Servidor · API en :3000">
+          <title>service · reglas del producto · Servidor · API en :3000</title>
+          <rect x="720" y="90" width="130" height="60" rx="8" class="c-mask"/>
+          <rect x="720" y="90" width="130" height="60" rx="8" class="c-backend" data-animate="node" style="--step:3" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(726 96) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="785" y="118" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">service</text>
+        <text data-detail="context" x="785" y="134" class="t-muted" font-size="9" text-anchor="middle">reglas del producto</text>
+        </g>
+
+        <g id="d-recorrido-axios-node-json" data-node-id="json" data-node-label="Datos guardados" tabindex="0" role="button" aria-label="Enfocar Datos guardados, JSON o base H2, Servidor · API en :3000" aria-pressed="false" data-node-kind="database" data-node-sublabel="JSON o base H2" data-node-context="Servidor · API en :3000">
+          <title>Datos guardados · JSON o base H2 · Servidor · API en :3000</title>
+          <rect x="890" y="200" width="130" height="60" rx="8" class="c-mask"/>
+          <rect x="890" y="200" width="130" height="60" rx="8" class="c-database" data-animate="node" style="--step:4" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(896 206) scale(0.6875)">
+            <ellipse cx="8" cy="4" rx="5" ry="2"/>
+            <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="955" y="228" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Datos guardados</text>
+        <text data-detail="context" x="955" y="244" class="t-muted" font-size="9" text-anchor="middle">JSON o base H2</text>
+        </g>
+
+        <!-- Connection labels -->
+
+        <g data-detail="context" data-edge-from="axios" data-edge-to="express" data-edge-label="HTTP + JSON" data-edge-key="1" data-edge-id="c2">
+          <rect x="408.6" y="100" width="62.8" height="14" rx="3" class="c-mask"/>
+          <text x="440" y="110" class="t-edge-emphasis" font-size="8" text-anchor="middle">HTTP + JSON</text>
+        </g>
+
+        <g data-detail="context" data-edge-from="logica" data-edge-to="json" data-edge-label="lee o escribe" data-edge-key="3" data-edge-id="c4">
+          <rect x="869.8" y="147" width="72.4" height="14" rx="3" class="c-mask"/>
+          <text x="906" y="157" class="t-edge-default" font-size="8" text-anchor="middle">lee o escribe</text>
+        </g>
+
+        <!-- Boundary labels (foreground masks keep routes out of titles) -->
+        <g data-graph-role="structural-frame-label" data-composition-frame-id="0" data-composition-frame-kind="region" data-composition-frame-label="Navegador · React en :5173">
+          <rect data-graph-role="structural-frame-label-mask" x="24" y="70" width="150.4" height="16" rx="3" class="c-mask"/>
+          <text data-boundary-label="" x="28" y="83" class="t-cloud" font-size="9" font-weight="600">Navegador · React en :5173</text>
+        </g>
+
+        <g data-graph-role="structural-frame-label" data-composition-frame-id="1" data-composition-frame-kind="region" data-composition-frame-label="Servidor · API en :3000">
+          <rect data-graph-role="structural-frame-label-mask" x="494" y="70" width="134.2" height="16" rx="3" class="c-mask"/>
+          <text data-boundary-label="" x="498" y="83" class="t-cloud" font-size="9" font-weight="600">Servidor · API en :3000</text>
+        </g>
+
+        <!-- Legend -->
+      </svg></div><ol class="steps"><li>La persona abre la página o envía el formulario.</li><li>React llama a una función del service.</li><li>Axios envía un GET o un POST a la API.</li><li>El backend valida, consulta o guarda, y responde con JSON.</li><li>React guarda la respuesta en su estado y dibuja la lista de nuevo.</li></ol><p>Una llamada HTTP tarda y puede fallar, así que Axios devuelve una <strong>promesa</strong>. <code>await</code> espera el resultado dentro de una función <code>async</code>, y <code>try/catch</code> deja mostrar un error si algo sale mal.</p><div class="clave-box"><strong>Son aplicaciones independientes.</strong> React no importa el código del backend ni toca sus datos. Solo envía solicitudes HTTP a sus rutas, y el backend (Express o Spring Boot) decide qué acepta y cómo lo guarda.</div></div><div class="section-divider"><span class="num">2</span> Pon a funcionar el ejemplo</div><div class="card"><p>Necesitas dos terminales abiertas al mismo tiempo: una para el backend y otra para el frontend. Si trabajas en una EC2, los comandos son los mismos y el README de cada repositorio explica qué cambiar para abrir los puertos y configurar CORS.</p><h3>Paso 1: levanta el backend</h3><p>Elige una de las dos versiones. En la terminal 1:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">Terminal 1: backend Express</span></div><pre>git clone https://github.com/ProfeMike-sudo/dsy1104-productos-api-express.git
+cd dsy1104-productos-api-express
+npm ci
+cp .env.example .env
+npm start</pre></div><p>El archivo <code>.env</code> guarda la configuración: el puerto 3000 y el origen del navegador que puede leer las respuestas (CORS). Cuando todo parte bien, la terminal muestra <em>API de productos escuchando en el puerto 3000</em>.</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">Terminal 1: backend Spring Boot</span></div><pre>git clone https://github.com/ProfeMike-sudo/dsy1104-productos-api-springboot.git
+cd dsy1104-productos-api-springboot
+./mvnw spring-boot:run</pre></div><p>La primera vez, <code>mvnw</code> descarga Maven y las dependencias, así que puede tardar varios minutos. Cuando termina, aparece una línea que empieza con <em>Started ProductosApiApplication</em>. En Windows el comando es <code>mvnw.cmd spring-boot:run</code>.</p><h3>Paso 2: comprueba que el backend responde</h3><p>Con el backend encendido, abre una terminal más (o el navegador) y pregunta por su estado y por los productos:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">Comprobación: otra terminal o el navegador</span></div><pre>curl http://localhost:3000/api/health
+curl http://localhost:3000/api/productos</pre></div><p>La primera respuesta debe ser <code>{"estado":"ok"}</code> y la segunda un arreglo vacío, <code>[]</code>, porque todavía no hay productos. Si ves un error de conexión, el backend no está encendido.</p><h3>Paso 3: levanta el frontend</h3><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">Terminal 2: frontend React</span></div><pre>git clone https://github.com/ProfeMike-sudo/dsy1104-productos-react-axios.git
+cd dsy1104-productos-react-axios
+npm ci
+cp .env.example .env
+npm run dev</pre></div><p>Abre <code>http://localhost:5173</code> en el navegador. Deberías ver el formulario "Nuevo producto" y el mensaje "Todavía no hay productos".</p><h3>Paso 4: guarda tu primer producto</h3><p>Escribe <em>Cuaderno</em>, precio <em>2500</em> y stock <em>8</em>, y presiona <strong>Guardar producto</strong>. Aparece un aviso verde y la tarjeta del producto en la lista. Recarga la página: el producto sigue ahí, porque quedó guardado en el backend y no en el navegador.</p><table class="ref-table"><thead><tr><th>Si ves esto</th><th>Qué revisar</th></tr></thead><tbody><tr><td>El puerto 3000 o 5173 ya está en uso</td><td>Hay otro proceso con ese puerto. Detenlo con Ctrl+C en su terminal antes de iniciar el nuevo.</td></tr><tr><td>La página dice que no pudo contactar la API</td><td>Que el backend siga encendido y que <code>VITE_API_URL</code> en el <code>.env</code> del frontend apunte a la dirección correcta. Después de cambiar un <code>.env</code>, reinicia el proceso.</td></tr><tr><td>El navegador muestra un error de CORS en la consola</td><td>Que el origen configurado en el backend sea exactamente el de la página, con protocolo y puerto: <code>http://localhost:5173</code>.</td></tr></tbody></table></div><div class="section-divider"><span class="num">3</span> El contrato de la API</div><div class="card"><p>Para consumir una API necesitas conocer su <strong>contrato</strong>: la dirección, las rutas, los métodos, los datos de entrada y las respuestas. Los repositorios ya lo traen. Aquí te toca ver cómo lo usa el código.</p><table class="ref-table"><thead><tr><th>Parte</th><th>Ejemplo</th><th>Para qué sirve</th></tr></thead><tbody><tr><td>Dirección base</td><td><code>http://localhost:3000/api</code></td><td>Identifica la API en este ejemplo local.</td></tr><tr><td>Recurso</td><td><code>/productos</code></td><td>Los datos que se consultan o se modifican.</td></tr><tr><td>Método</td><td><code>GET</code> o <code>POST</code></td><td>Leer o crear.</td></tr><tr><td>Cuerpo de entrada</td><td><code>nombre</code>, <code>precio</code>, <code>stock</code></td><td>Los datos que viajan en JSON al crear.</td></tr><tr><td>Respuesta</td><td>Estado HTTP y cuerpo JSON</td><td>Le comunica el resultado al frontend.</td></tr></tbody></table><p>La dirección base y la ruta se suman: <code>http://localhost:3000/api</code> más <code>/productos</code> da <code>http://localhost:3000/api/productos</code>. Esa dirección tiene que ser accesible desde el navegador que ejecuta React, y <code>localhost</code> es el computador de ese navegador.</p></div><div class="section-divider"><span class="num">4</span> Axios: una instancia y un service</div><div class="card"><p>La configuración de Axios vive en un solo módulo. Así los componentes no escriben direcciones ni repiten opciones.</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">src/services/api.js</span></div><pre>import axios from &#x27;axios&#x27;
+
+// Una instancia comparte dirección base y tiempo máximo entre solicitudes.
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || &#x27;http://localhost:3000/api&#x27;,
+  timeout: 10000
+})</pre></div><p><code>baseURL</code> es la dirección común: <code>api.get('/productos')</code> la agrega por delante. <code>timeout</code> limita la espera a 10 segundos. Vite lee <code>VITE_API_URL</code> del archivo <code>.env</code> cuando inicia o construye el proyecto.</p><p>El service reúne las llamadas HTTP:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">src/services/productoService.js</span></div><pre>import { api } from &#x27;./api&#x27;
+
+export async function listarProductos(signal) {
+  const respuesta = await api.get(&#x27;/productos&#x27;, { signal: signal })
+  // data es el cuerpo JSON; status y headers pertenecen a la respuesta HTTP.
+  return respuesta.data
+}
+
+export async function guardarProducto(dto) {
+  const respuesta = await api.post(&#x27;/productos&#x27;, dto)
+  return respuesta.data
+}</pre></div><p><code>respuesta.data</code> es el cuerpo JSON y <code>respuesta.status</code> es el estado (200, 201...). En un POST, el segundo argumento es el objeto que Axios envía como JSON. <code>signal</code> permite cancelar la lectura con <code>AbortController</code> cuando la página se desmonta.</p><table class="ref-table"><thead><tr><th>Acción</th><th>Método en Axios</th><th>En el ejemplo</th></tr></thead><tbody><tr><td>Listar</td><td><code>api.get('/productos')</code></td><td>Carga de la pantalla.</td></tr><tr><td>Crear</td><td><code>api.post('/productos', dto)</code></td><td>Formulario de nuevo producto.</td></tr><tr><td>Actualizar</td><td><code>api.put('/productos/ID', dto)</code></td><td>Existe en la API; pruébalo en Postman.</td></tr><tr><td>Eliminar</td><td><code>api.delete('/productos/ID')</code></td><td>Existe en la API y responde 204 sin cuerpo. Es el ejercicio del final.</td></tr></tbody></table><div class="info-box"><strong>CORS.</strong> React (puerto 5173) y el backend (puerto 3000) son orígenes distintos. El backend deja leer sus respuestas solo al origen exacto que indica <code>CORS_ORIGINS</code>, tanto en Express como en Spring Boot. CORS regula lo que el navegador permite leer y no autentica a nadie.</div></div><div class="section-divider"><span class="num">5</span> Guardar un producto, paso a paso</div><div class="card"><p>El diagrama sigue un clic en <strong>Guardar producto</strong>, desde el formulario hasta los datos guardados y de vuelta:</p><div class="diagrama-archify"><svg viewBox="0 0 920 450" data-sequence-column-fit="spread" data-reader-fit="width-first" role="img" lang="es" aria-labelledby="d-guardar-producto-archify-diagram-title d-guardar-producto-archify-diagram-description" data-animation="trace" data-preset="classic" data-quality-profile="showcase" data-motion-choreography="sequence">
+        <title id="d-guardar-producto-archify-diagram-title">Qué pasa al guardar un producto</title>
+        <desc id="d-guardar-producto-archify-diagram-description">Un diagrama de secuencia generado por Archify.</desc>
+        <!-- Definitions -->
+        <defs>
+          <marker id="d-guardar-producto-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-default" />
+          </marker>
+          <marker id="d-guardar-producto-arrowhead-emphasis" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-emphasis" />
+          </marker>
+          <marker id="d-guardar-producto-arrowhead-security" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-security" />
+          </marker>
+          <marker id="d-guardar-producto-arrowhead-dashed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-dashed" />
+          </marker>
+          <pattern id="d-guardar-producto-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" class="c-grid" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+
+        <!-- Background Grid -->
+        <rect width="100%" height="100%" fill="url(#d-guardar-producto-grid)" />
+
+        <!-- Time Segments -->
+
+
+        <!-- Lifelines -->
+        <path d="M 129.5 142 L 129.5 416" class="a-default" stroke-width="0.8" stroke-dasharray="3,7"/>
+        <path d="M 300.25 142 L 300.25 416" class="a-default" stroke-width="0.8" stroke-dasharray="3,7"/>
+        <path d="M 471 142 L 471 416" class="a-default" stroke-width="0.8" stroke-dasharray="3,7"/>
+        <path d="M 641.75 142 L 641.75 416" class="a-default" stroke-width="0.8" stroke-dasharray="3,7"/>
+        <path d="M 812.5 142 L 812.5 416" class="a-default" stroke-width="0.8" stroke-dasharray="3,7"/>
+
+        <!-- Activations -->
+        <rect x="124.5" y="166" width="10" height="248" rx="3" class="c-mask"/>
+        <rect x="124.5" y="166" width="10" height="248" rx="3" class="c-frontend" stroke-width="1"/>
+        <rect x="295.25" y="198" width="10" height="184" rx="3" class="c-mask"/>
+        <rect x="295.25" y="198" width="10" height="184" rx="3" class="c-frontend" stroke-width="1"/>
+        <rect x="466" y="230" width="10" height="120" rx="3" class="c-mask"/>
+        <rect x="466" y="230" width="10" height="120" rx="3" class="c-frontend" stroke-width="1"/>
+        <rect x="636.75" y="262" width="10" height="24" rx="3" class="c-mask"/>
+        <rect x="636.75" y="262" width="10" height="24" rx="3" class="c-backend" stroke-width="1"/>
+
+        <!-- Messages -->
+        <g data-edge-from="formulario" data-edge-to="pagina" data-edge-label="onGuardar(dto)" data-edge-key="0" data-edge-id="m2">
+          <path data-composition-edge-from="formulario" data-composition-edge-to="pagina" data-composition-edge-id="m2" data-composition-points="136.5,170;293.25,170" d="M 136.5 170 L 293.25 170" class="a-emphasis" data-animate="edge" style="--step:0" stroke-width="1.8" marker-end="url(#d-guardar-producto-arrowhead-emphasis)"/>
+        <g data-detail="context">
+          <rect x="162.675" y="150" width="104.39999999999999" height="18" rx="3" class="c-mask"/>
+          <text x="214.875" y="160" class="t-edge-emphasis" font-size="11" text-anchor="middle">onGuardar(dto)</text>
+        </g>
+        </g>
+
+        <g data-edge-from="pagina" data-edge-to="axios" data-edge-label="guardarProducto(dto)" data-edge-key="1" data-edge-id="m3">
+          <path data-composition-edge-from="pagina" data-composition-edge-to="axios" data-composition-edge-id="m3" data-composition-points="307.25,202;464,202" d="M 307.25 202 L 464 202" class="a-emphasis" data-animate="edge" style="--step:1" stroke-width="1.8" marker-end="url(#d-guardar-producto-arrowhead-emphasis)"/>
+        <g data-detail="context">
+          <rect x="313.625" y="182" width="144" height="18" rx="3" class="c-mask"/>
+          <text x="385.625" y="192" class="t-edge-emphasis" font-size="11" text-anchor="middle">guardarProducto(dto)</text>
+        </g>
+        </g>
+
+        <g data-edge-from="axios" data-edge-to="express" data-edge-label="POST /api/productos" data-edge-key="2" data-edge-id="m4">
+          <path data-composition-edge-from="axios" data-composition-edge-to="express" data-composition-edge-id="m4" data-composition-points="478,234;634.75,234" d="M 478 234 L 634.75 234" class="a-emphasis" data-animate="edge" style="--step:2" stroke-width="1.8" marker-end="url(#d-guardar-producto-arrowhead-emphasis)"/>
+        <g data-detail="context">
+          <rect x="487.675" y="214" width="137.39999999999998" height="18" rx="3" class="c-mask"/>
+          <text x="556.375" y="224" class="t-edge-emphasis" font-size="11" text-anchor="middle">POST /api/productos</text>
+        </g>
+        </g>
+
+        <g data-edge-from="express" data-edge-to="archivo" data-edge-label="guarda con id nuevo" data-edge-key="3" data-edge-id="m5">
+          <path data-composition-edge-from="express" data-composition-edge-to="archivo" data-composition-edge-id="m5" data-composition-points="648.75,266;805.5,266" d="M 648.75 266 L 805.5 266" class="a-default" data-animate="edge" style="--step:3" stroke-width="1.4" marker-end="url(#d-guardar-producto-arrowhead)"/>
+        <g data-detail="context">
+          <rect x="658.425" y="246" width="137.39999999999998" height="18" rx="3" class="c-mask"/>
+          <text x="727.125" y="256" class="t-muted" font-size="11" text-anchor="middle">guarda con id nuevo</text>
+        </g>
+        </g>
+
+        <g data-edge-from="archivo" data-edge-to="express" data-edge-label="listo" data-edge-key="4" data-edge-id="m6">
+          <path data-composition-edge-from="archivo" data-composition-edge-to="express" data-composition-edge-id="m6" data-composition-points="805.5,298;648.75,298" d="M 805.5 298 L 648.75 298" class="a-default" data-animate="edge" style="--step:4" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#d-guardar-producto-arrowhead)"/>
+        <g data-detail="context">
+          <rect x="704.625" y="278" width="45" height="18" rx="3" class="c-mask"/>
+          <text x="727.125" y="288" class="t-muted" font-size="11" text-anchor="middle">listo</text>
+        </g>
+        </g>
+
+        <g data-edge-from="express" data-edge-to="axios" data-edge-label="201 + producto con id" data-edge-key="5" data-edge-id="m7">
+          <path data-composition-edge-from="express" data-composition-edge-to="axios" data-composition-edge-id="m7" data-composition-points="634.75,330;478,330" d="M 634.75 330 L 478 330" class="a-default" data-animate="edge" style="--step:5" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#d-guardar-producto-arrowhead)"/>
+        <g data-detail="context">
+          <rect x="481.075" y="310" width="150.6" height="18" rx="3" class="c-mask"/>
+          <text x="556.375" y="320" class="t-muted" font-size="11" text-anchor="middle">201 + producto con id</text>
+        </g>
+        </g>
+
+        <g data-edge-from="axios" data-edge-to="pagina" data-edge-label="respuesta.data" data-edge-key="6" data-edge-id="m8">
+          <path data-composition-edge-from="axios" data-composition-edge-to="pagina" data-composition-edge-id="m8" data-composition-points="464,362;307.25,362" d="M 464 362 L 307.25 362" class="a-default" data-animate="edge" style="--step:6" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#d-guardar-producto-arrowhead)"/>
+        <g data-detail="context">
+          <rect x="333.425" y="342" width="104.39999999999999" height="18" rx="3" class="c-mask"/>
+          <text x="385.625" y="352" class="t-muted" font-size="11" text-anchor="middle">respuesta.data</text>
+        </g>
+        </g>
+
+        <g data-edge-from="pagina" data-edge-to="formulario" data-edge-label="true" data-edge-key="7" data-edge-id="m9">
+          <path data-composition-edge-from="pagina" data-composition-edge-to="formulario" data-composition-edge-id="m9" data-composition-points="293.25,394;136.5,394" d="M 293.25 394 L 136.5 394" class="a-default" data-animate="edge" style="--step:7" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#d-guardar-producto-arrowhead)"/>
+        <g data-detail="context">
+          <rect x="195.675" y="374" width="38.4" height="18" rx="3" class="c-mask"/>
+          <text x="214.875" y="384" class="t-muted" font-size="11" text-anchor="middle">true</text>
+        </g>
+        </g>
+
+        <!-- Segment Labels -->
+
+
+        <!-- Participants -->
+        <g id="d-guardar-producto-node-formulario" data-node-id="formulario" data-node-label="FormularioProducto" tabindex="0" role="button" aria-label="Enfocar FormularioProducto, props.onGuardar, Participante de secuencia" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="props.onGuardar" data-node-context="Participante de secuencia">
+          <title>FormularioProducto · props.onGuardar · Participante de secuencia</title>
+          <rect x="62" y="72" width="135" height="60" rx="6" class="c-mask"/>
+          <rect x="62" y="72" width="135" height="60" rx="6" class="c-frontend" data-animate="node" style="--step:0" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(68 78) scale(0.6875)">
+            <rect x="2" y="3" width="12" height="10" rx="2"/>
+            <path d="M2 6.5h12"/>
+            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
+            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="129.5" y="108" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">FormularioProducto</text>
+          <text data-detail="context" x="129.5" y="122" class="t-muted" font-size="7" text-anchor="middle">props.onGuardar</text>
+        </g>
+
+        <g id="d-guardar-producto-node-pagina" data-node-id="pagina" data-node-label="ProductosPage" tabindex="0" role="button" aria-label="Enfocar ProductosPage, crearProducto, Participante de secuencia" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="crearProducto" data-node-context="Participante de secuencia">
+          <title>ProductosPage · crearProducto · Participante de secuencia</title>
+          <rect x="232.75" y="72" width="135" height="60" rx="6" class="c-mask"/>
+          <rect x="232.75" y="72" width="135" height="60" rx="6" class="c-frontend" data-animate="node" style="--step:1" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(238.75 78) scale(0.6875)">
+            <rect x="2" y="3" width="12" height="10" rx="2"/>
+            <path d="M2 6.5h12"/>
+            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
+            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="300.25" y="108" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">ProductosPage</text>
+          <text data-detail="context" x="300.25" y="122" class="t-muted" font-size="7" text-anchor="middle">crearProducto</text>
+        </g>
+
+        <g id="d-guardar-producto-node-axios" data-node-id="axios" data-node-label="Axios" tabindex="0" role="button" aria-label="Enfocar Axios, productoService, Participante de secuencia" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="productoService" data-node-context="Participante de secuencia">
+          <title>Axios · productoService · Participante de secuencia</title>
+          <rect x="403.5" y="72" width="135" height="60" rx="6" class="c-mask"/>
+          <rect x="403.5" y="72" width="135" height="60" rx="6" class="c-frontend" data-animate="node" style="--step:2" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(409.5 78) scale(0.6875)">
+            <rect x="2" y="3" width="12" height="10" rx="2"/>
+            <path d="M2 6.5h12"/>
+            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
+            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="471" y="108" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Axios</text>
+          <text data-detail="context" x="471" y="122" class="t-muted" font-size="7" text-anchor="middle">productoService</text>
+        </g>
+
+        <g id="d-guardar-producto-node-express" data-node-id="express" data-node-label="API" tabindex="0" role="button" aria-label="Enfocar API, Express o Spring Boot, Participante de secuencia" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Express o Spring Boot" data-node-context="Participante de secuencia">
+          <title>API · Express o Spring Boot · Participante de secuencia</title>
+          <rect x="574.25" y="72" width="135" height="60" rx="6" class="c-mask"/>
+          <rect x="574.25" y="72" width="135" height="60" rx="6" class="c-backend" data-animate="node" style="--step:3" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(580.25 78) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="641.75" y="108" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">API</text>
+          <text data-detail="context" x="641.75" y="122" class="t-muted" font-size="7" text-anchor="middle">Express o Spring Boot</text>
+        </g>
+
+        <g id="d-guardar-producto-node-archivo" data-node-id="archivo" data-node-label="Datos" tabindex="0" role="button" aria-label="Enfocar Datos, JSON o base H2, Participante de secuencia" aria-pressed="false" data-node-kind="database" data-node-sublabel="JSON o base H2" data-node-context="Participante de secuencia">
+          <title>Datos · JSON o base H2 · Participante de secuencia</title>
+          <rect x="745" y="72" width="135" height="60" rx="6" class="c-mask"/>
+          <rect x="745" y="72" width="135" height="60" rx="6" class="c-database" data-animate="node" style="--step:4" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(751 78) scale(0.6875)">
+            <ellipse cx="8" cy="4" rx="5" ry="2"/>
+            <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="812.5" y="108" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Datos</text>
+          <text data-detail="context" x="812.5" y="122" class="t-muted" font-size="7" text-anchor="middle">JSON o base H2</text>
+        </g>
+
+        <!-- Legend -->
+      </svg></div><p>Cada flecha corresponde a una pieza del código. Léelas en este orden con el proyecto abierto:</p><ol class="steps"><li><strong>Formulario.</strong> Al enviar, <code>enviar</code> en <code>FormularioProducto.jsx</code> cancela la recarga de la página y revisa que el nombre tenga al menos dos caracteres.</li><li><strong>DTO del frontend.</strong> <code>crearProductoRequestDto</code> convierte los textos del formulario en números y arma el <code>dto</code>. Luego el formulario llama a <code>props.onGuardar(dto)</code>.</li><li><strong>Página.</strong> <code>onGuardar</code> es la función <code>crearProducto</code> de <code>ProductosPage.jsx</code>. Marca que está guardando y llama a <code>guardarProducto(dto)</code>.</li><li><strong>Service y Axios.</strong> <code>guardarProducto</code> ejecuta <code>api.post('/productos', dto)</code>. Axios agrega la dirección base y envía el JSON.</li><li><strong>Backend: DTO de entrada.</strong> La API valida el cuerpo y se queda solo con <code>nombre</code>, <code>precio</code> y <code>stock</code>. Si algo no cumple, responde 400 y el recorrido salta a la sección 7.</li><li><strong>Backend: service y datos.</strong> El service crea el producto con un id nuevo y lo guarda (en un archivo JSON con Express, en la base H2 con Spring Boot).</li><li><strong>Respuesta.</strong> La API responde 201 con el DTO de salida: el producto con su id y sin <code>fechaCreacion</code>.</li><li><strong>De vuelta en React.</strong> Axios entrega el cuerpo en <code>respuesta.data</code>, y <code>guardarProducto</code> se lo devuelve a la página.</li><li><strong>Estado.</strong> <code>crearProducto</code> agrega el producto a la lista con <code>setProductos</code> y devuelve <code>true</code>. El formulario ve ese <code>true</code>, limpia sus campos y React dibuja la tarjeta nueva.</li></ol><h3>El DTO: los datos que viajan</h3><p>DTO significa <em>Data Transfer Object</em>: un objeto con los campos que se transfieren entre dos partes del sistema. No es un componente ni una tabla de la base de datos. En el recorrido hay dos tipos.</p><p>En React, el DTO de entrada convierte los textos del formulario en el cuerpo que exige la API:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">src/dto/producto.dto.js (frontend)</span></div><pre>// Los inputs HTML entregan texto. El contrato de la API exige números.
+export function crearProductoRequestDto(formulario) {
+  return {
+    nombre: formulario.nombre.trim(),
+    precio: Number(formulario.precio),
+    stock: Number(formulario.stock)
+  }
+}</pre></div><p>En el backend, el DTO de entrada valida y deja pasar solo los campos permitidos, y el DTO de salida decide qué devuelve. Las reglas son las mismas en Express y en Spring Boot:</p><table class="ref-table"><thead><tr><th>Campo</th><th>Regla del DTO de entrada</th></tr></thead><tbody><tr><td><code>nombre</code></td><td>Texto de 2 a 80 caracteres, sin contar los espacios de los lados.</td></tr><tr><td><code>precio</code></td><td>Número entre 0 y 100000000.</td></tr><tr><td><code>stock</code></td><td>Entero entre 0 y 1000000.</td></tr><tr><td><code>id</code></td><td>No lo envía el cliente, lo genera el servidor. Si llega, se descarta.</td></tr></tbody></table><p>El DTO de salida devuelve <code>id</code>, <code>nombre</code>, <code>precio</code> y <code>stock</code>. El campo <code>fechaCreacion</code> queda guardado pero no viaja. El backend valida otra vez aunque React ya lo haya hecho, porque cualquier cliente puede llamar a la API sin pasar por tu formulario.</p><h3>Cómo se reparte el trabajo en el backend</h3><p>Es la misma división de responsabilidades que armaron en la guía 19, con los nombres de cada tecnología:</p><table class="ref-table"><thead><tr><th>Responsabilidad (guía 19)</th><th>Express</th><th>Spring Boot</th></tr></thead><tbody><tr><td>Controladores y rutas HTTP</td><td><code>src/routes/</code></td><td><code>controller/</code></td></tr><tr><td>Datos de entrada y salida (DTO)</td><td><code>src/dto/</code>: funciones que validan</td><td><code>dto/</code>: clases con anotaciones</td></tr><tr><td>Servicios</td><td><code>src/services/</code></td><td><code>service/</code></td></tr><tr><td>Acceso a datos</td><td><code>src/repositories/</code>: archivo JSON</td><td><code>repository/</code>: JpaRepository y H2</td></tr><tr><td>Modelo persistente</td><td>Objeto guardado en el JSON</td><td><code>model/</code>: entidad <code>Producto</code></td></tr><tr><td>Seguridad</td><td colspan="2">Fuera de este ejemplo: no hay login ni JWT.</td></tr></tbody></table><p>Este es el mismo POST en cada backend. Primero Express:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">Express: src/routes/producto.routes.js</span></div><pre>  router.post(&#x27;/&#x27;, (req, res) =&gt; {
+    const entrada = crearProductoEntradaDto(req.body);
+    const creado = service.crear(entrada);
+    res.status(201).location(&#x27;/api/productos/&#x27; + creado.id).json(crearProductoSalidaDto(creado));
+  });</pre></div><p><code>req.body</code> trae el JSON que envió Axios, que <code>express.json()</code> ya interpretó. Si el DTO lo acepta, el service crea el producto y la ruta responde 201 con el DTO de salida.</p><p>Y ahora Spring Boot:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">Spring Boot: controller/ProductoController.java</span></div><pre>    // @Valid ejecuta las validaciones del DTO de entrada antes de llegar al service.
+    @PostMapping
+    public ResponseEntity&lt;ProductoSalidaDTO&gt; crear(@Valid @RequestBody ProductoEntradaDTO entrada) {
+        ProductoSalidaDTO creado = service.crear(entrada);
+        return ResponseEntity.created(URI.create(&quot;/api/productos/&quot; + creado.getId())).body(creado);</pre></div><p><code>@RequestBody</code> convierte el JSON en un <code>ProductoEntradaDTO</code> y <code>@Valid</code> ejecuta sus validaciones. Si fallan, el manejador de errores responde 400 con la misma forma <code>{ mensaje, detalles }</code> que usa Express. Si pasan, el service crea el producto y el controlador responde 201.</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">Spring Boot: dto/ProductoEntradaDTO.java</span></div><pre>// DTO de entrada: lo que el cliente envía en POST y PUT. Solo declara tres campos:
+// si llega un id o cualquier otro dato, Jackson lo ignora. El id lo genera el servidor.
+@Data
+@NoArgsConstructor
+public class ProductoEntradaDTO {
+
+    @NotNull(message = &quot;El nombre es obligatorio.&quot;)
+    @Size(min = 2, max = 80, message = &quot;El nombre debe tener entre 2 y 80 caracteres.&quot;)
+    private String nombre;
+
+    @NotNull(message = &quot;El precio es obligatorio.&quot;)
+    @DecimalMin(value = &quot;0&quot;, message = &quot;El precio debe ser un número entre 0 y 100000000.&quot;)
+    @DecimalMax(value = &quot;100000000&quot;, message = &quot;El precio debe ser un número entre 0 y 100000000.&quot;)
+    private BigDecimal precio;
+
+    @NotNull(message = &quot;El stock es obligatorio.&quot;)
+    @Min(value = 0, message = &quot;El stock debe ser un entero entre 0 y 1000000.&quot;)
+    @Max(value = 1000000, message = &quot;El stock debe ser un entero entre 0 y 1000000.&quot;)
+    private Integer stock;
+
+    // Los espacios a los lados no cuentan: se quitan antes de validar el largo.
+    public void setNombre(String nombre) {
+        this.nombre = nombre == null ? null : nombre.strip();
+    }
+}</pre></div><p>La diferencia está en cómo se escriben las reglas. Express las revisa con una función sobre el cuerpo, y Spring Boot las declara con anotaciones sobre cada campo. En los dos casos, Axios recibe el DTO de salida en <code>respuesta.data</code>.</p></div><div class="section-divider"><span class="num">6</span> React: Atomic Design y props.algo</div><div class="card"><p>El frontend organiza sus componentes por niveles. Cada uno tiene un trabajo y solo conoce al nivel de abajo:</p><table class="ref-table"><thead><tr><th>Nivel</th><th>Archivos</th><th>Responsabilidad</th></tr></thead><tbody><tr><td>Átomos</td><td>Boton, Etiqueta, Entrada</td><td>Controles básicos.</td></tr><tr><td>Moléculas</td><td>CampoFormulario, MensajeEstado, TarjetaProducto</td><td>Unidades de interfaz.</td></tr><tr><td>Organismos</td><td>FormularioProducto, ListaProductos</td><td>Formulario y lista.</td></tr><tr><td>Templates</td><td>ProductosTemplate</td><td>Distribución responsiva con React Bootstrap (<code>Container</code>, <code>Row</code>, <code>Col</code>).</td></tr><tr><td>Pages</td><td>ProductosPage</td><td>Estado, llamadas al service y errores.</td></tr></tbody></table><p>Las llamadas HTTP y los DTO viven en <code>services/</code> y <code>dto/</code>, nunca en los átomos. La página es la única que sabe que existe Axios.</p><h3>De la respuesta al estado</h3><p>Cuando la página aparece, pide la lista y guarda el arreglo en su estado con <code>setProductos(datos)</code>. React dibuja de nuevo, y la página entrega ese estado hacia abajo como props:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">src/pages/ProductosPage.jsx</span></div><pre>&lt;ListaProductos productos={productos} cargando={cargando} error={errorLista} /&gt;</pre></div><p>El acceso con punto, <code>props.algo</code>, lee los valores y las funciones que recibe un componente. <code>algo</code> es el nombre de la propiedad: <code>props.productos</code>, <code>props.onGuardar</code>. Así lo hace la lista:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">src/components/organisms/ListaProductos/ListaProductos.jsx</span></div><pre>import { Row, Col } from &#x27;react-bootstrap&#x27;
+import { TarjetaProducto } from &#x27;../../molecules/TarjetaProducto/TarjetaProducto&#x27;
+
+// Organismo: la lista de productos. Según lo que reciba por props, dibuja
+// el estado de carga, el error, la lista vacía o las tarjetas.
+export function ListaProductos(props) {
+  if (props.cargando) return &lt;p role=&quot;status&quot;&gt;Cargando productos...&lt;/p&gt;
+  if (props.error) return &lt;p&gt;La lista no está disponible. Usa el botón para reintentar.&lt;/p&gt;
+  if (props.productos.length === 0) return &lt;p className=&quot;text-body-secondary&quot;&gt;Todavía no hay productos. Guarda el primero.&lt;/p&gt;
+
+  return (
+    // xs={12} md={6}: una tarjeta por fila en celular y dos desde tablet.
+    &lt;Row className=&quot;g-3&quot;&gt;
+      {props.productos.map((producto) =&gt; (
+        // key identifica cada tarjeta con el id que asignó el backend.
+        &lt;Col xs={12} md={6} key={producto.id}&gt;
+          &lt;TarjetaProducto producto={producto} /&gt;
+        &lt;/Col&gt;
+      ))}
+    &lt;/Row&gt;
+  )
+}</pre></div><p><code>map()</code> convierte cada producto en un elemento y <code>key</code> lo identifica con el <code>id</code> que asignó el backend. La tarjeta lee <code>props.producto.nombre</code>, <code>props.producto.precio</code> y <code>props.producto.stock</code>.</p><p>En el formulario, <code>props.onGuardar(dto)</code> llama a la función que le entregó la página. La página hace el POST y agrega a su estado el producto que devolvió el servidor:</p><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">src/pages/ProductosPage.jsx: crearProducto</span></div><pre>  async function crearProducto(dto) {
+    setGuardando(true)
+    setErrorGuardado(&#x27;&#x27;)
+    setExito(&#x27;&#x27;)
+    try {
+      const creado = await guardarProducto(dto)
+      // Usamos el DTO de respuesta: su id lo asignó el backend.
+      setProductos((anteriores) =&gt; anteriores.concat(creado))
+      setExito(&#x27;Producto guardado correctamente.&#x27;)
+      return true
+    } catch (error) {
+      setErrorGuardado(obtenerMensajeError(error))
+      return false
+    } finally {
+      setGuardando(false)
+    }
+  }</pre></div><p>El formulario limpia sus campos solo si <code>props.onGuardar</code> devuelve <code>true</code>. El bloque <code>finally</code> apaga el estado "guardando" tanto si hubo éxito como si hubo error.</p><div class="info-box"><code>const [nombre, setNombre] = useState('')</code> desestructura el resultado de un hook. No desestructura las props.</div></div><div class="section-divider"><span class="num">7</span> Cuando algo falla</div><div class="card"><p>Axios rechaza la promesa si el estado HTTP queda fuera de 200 a 299, o si nunca llega una respuesta. El <code>catch</code> tiene que distinguir los casos para mostrar un mensaje útil. Este es el camino que sigue el código:</p><div class="diagrama-archify"><svg viewBox="0 0 920 300" data-layout-contract="readable-v2" role="img" lang="es" aria-labelledby="d-errores-axios-archify-diagram-title d-errores-axios-archify-diagram-description" data-animation="trace" data-preset="classic" data-quality-profile="showcase" data-node-ui="">
+        <title id="d-errores-axios-archify-diagram-title">Qué le muestra la pantalla a la persona cuando algo falla</title>
+        <desc id="d-errores-axios-archify-diagram-description">Un diagrama de flujo de trabajo generado por Archify.</desc>
+        <!-- Definitions -->
+        <defs>
+          <marker id="d-errores-axios-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-default" />
+          </marker>
+          <marker id="d-errores-axios-arrowhead-emphasis" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-emphasis" />
+          </marker>
+          <marker id="d-errores-axios-arrowhead-security" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-security" />
+          </marker>
+          <marker id="d-errores-axios-arrowhead-dashed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-dashed" />
+          </marker>
+          <pattern id="d-errores-axios-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" class="c-grid" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        
+
+        <!-- Background Grid -->
+        <rect width="100%" height="100%" fill="url(#d-errores-axios-grid)" />
+
+        <!-- Swimlanes -->
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-0" x="40" y="52" width="864" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="74" class="t-muted" font-size="10" font-weight="600">01 / catch (error)</text>
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-1" x="40" y="176" width="864" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="198" class="t-muted" font-size="10" font-weight="600">02 / Mensaje en pantalla</text>
+
+        <!-- Phase headers -->
+
+
+        <!-- Workflow groups -->
+
+
+        <!-- Edge paths -->
+        <path data-edge-from="inicio" data-edge-to="resp" data-edge-key="0" data-edge-id="e1" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="168,119;200,119" d="M 168 119 L 200 119" class="a-default" data-animate="edge" style="--step:0" stroke-width="1.4" marker-end="url(#d-errores-axios-arrowhead)"/>
+        <path data-edge-from="resp" data-edge-to="m400" data-edge-label="sí" data-edge-key="1" data-edge-id="e2" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="252,145;252,217" d="M 252 145 L 252 217" class="a-emphasis" data-animate="edge" style="--step:1" stroke-width="1.8" marker-end="url(#d-errores-axios-arrowhead-emphasis)"/>
+        <path data-edge-from="resp" data-edge-to="tarde" data-edge-label="no" data-edge-key="2" data-edge-id="e3" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="304,119;366,119" d="M 304 119 L 366 119" class="a-default" data-animate="edge" style="--step:5" stroke-width="1.4" marker-end="url(#d-errores-axios-arrowhead)"/>
+        <path data-edge-from="tarde" data-edge-to="mtime" data-edge-label="sí" data-edge-key="3" data-edge-id="e4" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="412,145;412,217" d="M 412 145 L 412 217" class="a-emphasis" data-animate="edge" style="--step:6" stroke-width="1.8" marker-end="url(#d-errores-axios-arrowhead-emphasis)"/>
+        <path data-edge-from="tarde" data-edge-to="mred" data-edge-label="no" data-edge-key="4" data-edge-id="e5" data-composition-routing="workflow-v2-auto" data-edge-role="" data-composition-points="458,119;606,119;606,217" d="M 458 119 L 598 119 Q 606 119 606 127 L 606 217" class="a-default" data-animate="edge" style="--step:7" stroke-width="1.4" marker-end="url(#d-errores-axios-arrowhead)"/>
+
+        <!-- Nodes -->
+        <g id="d-errores-axios-node-inicio" data-node-id="inicio" data-node-label="Falla la solicitud" tabindex="0" role="button" aria-label="Enfocar Falla la solicitud, Axios rechaza la promesa, catch (error)" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="Axios rechaza la promesa" data-node-context="catch (error)">
+          <title>Falla la solicitud · Axios rechaza la promesa · catch (error)</title>
+          <rect x="48" y="93" width="120" height="52" rx="8" class="c-mask"/>
+          <rect x="48" y="93" width="120" height="52" rx="8" class="c-frontend" data-animate="node" style="--step:0" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(54 99) scale(0.6875)">
+            <rect x="2" y="3" width="12" height="10" rx="2"/>
+            <path d="M2 6.5h12"/>
+            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
+            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="108" y="124.4" class="t-primary" font-size="10.3" font-weight="600" text-anchor="middle">Falla la solicitud</text>
+          <text data-detail="context" x="108" y="138.8" class="t-muted" font-size="7.7" text-anchor="middle">Axios rechaza la promesa</text>
+        </g>
+
+        <g id="d-errores-axios-node-resp" data-node-id="resp" data-node-label="¿error.response?" tabindex="0" role="button" aria-label="Enfocar ¿error.response?, ¿llegó una respuesta?, catch (error)" aria-pressed="false" data-node-kind="external" data-node-sublabel="¿llegó una respuesta?" data-node-context="catch (error)">
+          <title>¿error.response? · ¿llegó una respuesta? · catch (error)</title>
+          <rect x="200" y="93" width="104" height="52" rx="8" class="c-mask"/>
+          <rect x="200" y="93" width="104" height="52" rx="8" class="c-external" data-animate="node" style="--step:1" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(206 99) scale(0.6875)">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="252" y="124" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">¿error.response?</text>
+          <text data-detail="context" x="252" y="138.2" class="t-muted" font-size="7.6" text-anchor="middle">¿llegó una respuesta?</text>
+        </g>
+
+        <g id="d-errores-axios-node-tarde" data-node-id="tarde" data-node-label="¿ECONNABORTED?" tabindex="0" role="button" aria-label="Enfocar ¿ECONNABORTED?, ¿pasaron 10 s?, catch (error)" aria-pressed="false" data-node-kind="external" data-node-sublabel="¿pasaron 10 s?" data-node-context="catch (error)">
+          <title>¿ECONNABORTED? · ¿pasaron 10 s? · catch (error)</title>
+          <rect x="366" y="93" width="92" height="52" rx="8" class="c-mask"/>
+          <rect x="366" y="93" width="92" height="52" rx="8" class="c-external" data-animate="node" style="--step:5" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(372 99) scale(0.6875)">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="412" y="124" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">¿ECONNABORTED?</text>
+          <text data-detail="context" x="412" y="138.6" class="t-muted" font-size="8" text-anchor="middle">¿pasaron 10 s?</text>
+        </g>
+
+        <g id="d-errores-axios-node-m400" data-node-id="m400" data-node-label="Mensaje de la API" tabindex="0" role="button" aria-label="Enfocar Mensaje de la API, datos.mensaje y detalles, Mensaje en pantalla" aria-pressed="false" data-node-kind="backend" data-node-sublabel="datos.mensaje y detalles" data-node-context="Mensaje en pantalla">
+          <title>Mensaje de la API · datos.mensaje y detalles · Mensaje en pantalla</title>
+          <rect x="196" y="217" width="112" height="52" rx="8" class="c-mask"/>
+          <rect x="196" y="217" width="112" height="52" rx="8" class="c-backend" data-animate="node" style="--step:2" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(202 223) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="252" y="248.2" class="t-primary" font-size="10.1" font-weight="600" text-anchor="middle">Mensaje de la API</text>
+          <text data-detail="context" x="252" y="261.9" class="t-muted" font-size="7.2" text-anchor="middle">datos.mensaje y detalles</text>
+        </g>
+
+        <g id="d-errores-axios-node-mtime" data-node-id="mtime" data-node-label="La API tardó demasiado" tabindex="0" role="button" aria-label="Enfocar La API tardó demasiado, revisa antes de reenviar, Mensaje en pantalla" aria-pressed="false" data-node-kind="backend" data-node-sublabel="revisa antes de reenviar" data-node-context="Mensaje en pantalla">
+          <title>La API tardó demasiado · revisa antes de reenviar · Mensaje en pantalla</title>
+          <rect x="340" y="217" width="144" height="52" rx="8" class="c-mask"/>
+          <rect x="340" y="217" width="144" height="52" rx="8" class="c-backend" data-animate="node" style="--step:7" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(346 223) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="412" y="248.4" class="t-primary" font-size="10.3" font-weight="600" text-anchor="middle">La API tardó demasiado</text>
+          <text data-detail="context" x="412" y="263.1" class="t-muted" font-size="8" text-anchor="middle">revisa antes de reenviar</text>
+        </g>
+
+        <g id="d-errores-axios-node-mred" data-node-id="mred" data-node-label="No se pudo contactar la API" tabindex="0" role="button" aria-label="Enfocar No se pudo contactar la API, red, dirección, CORS, Mensaje en pantalla" aria-pressed="false" data-node-kind="backend" data-node-sublabel="red, dirección, CORS" data-node-context="Mensaje en pantalla">
+          <title>No se pudo contactar la API · red, dirección, CORS · Mensaje en pantalla</title>
+          <rect x="516" y="217" width="180" height="52" rx="8" class="c-mask"/>
+          <rect x="516" y="217" width="180" height="52" rx="8" class="c-backend" data-animate="node" style="--step:8" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(522 223) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="606" y="248.8" class="t-primary" font-size="10.6" font-weight="600" text-anchor="middle">No se pudo contactar la API</text>
+          <text data-detail="context" x="606" y="263.6" class="t-muted" font-size="8" text-anchor="middle">red, dirección, CORS</text>
+        </g>
+
+        <!-- Edge labels -->
+
+        <g data-detail="context" data-edge-from="resp" data-edge-to="m400" data-edge-label="sí" data-edge-key="1" data-edge-id="e2">
+          <rect x="237" y="171" width="30" height="14" rx="3" class="c-mask"/>
+          <text x="252" y="181" class="t-edge-emphasis" font-size="8" text-anchor="middle">sí</text>
+        </g>
+        <g data-detail="context" data-edge-from="resp" data-edge-to="tarde" data-edge-label="no" data-edge-key="2" data-edge-id="e3">
+          <rect x="320" y="99" width="30" height="14" rx="3" class="c-mask"/>
+          <text x="335" y="109" class="t-muted" font-size="8" text-anchor="middle">no</text>
+        </g>
+        <g data-detail="context" data-edge-from="tarde" data-edge-to="mtime" data-edge-label="sí" data-edge-key="3" data-edge-id="e4">
+          <rect x="397" y="171" width="30" height="14" rx="3" class="c-mask"/>
+          <text x="412" y="181" class="t-edge-emphasis" font-size="8" text-anchor="middle">sí</text>
+        </g>
+        <g data-detail="context" data-edge-from="tarde" data-edge-to="mred" data-edge-label="no" data-edge-key="4" data-edge-id="e5">
+          <rect x="517" y="99" width="30" height="14" rx="3" class="c-mask"/>
+          <text x="532" y="109" class="t-muted" font-size="8" text-anchor="middle">no</text>
+        </g>
+
+        <!-- Legend -->
+      </svg></div><div class="code-wrap"><div class="code-header"><div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div><span class="lang">src/services/productoService.js: obtenerMensajeError</span></div><pre>export function obtenerMensajeError(error) {
+  if (error.response) {
+    // Hubo respuesta HTTP: por ejemplo, 400 con errores del DTO de entrada.
+    const datos = error.response.data
+    if (datos &amp;&amp; typeof datos.mensaje === &#x27;string&#x27;) {
+      const detalles = Array.isArray(datos.detalles) ? datos.detalles.join(&#x27; &#x27;) : &#x27;&#x27;
+      return datos.mensaje + (detalles ? &#x27; &#x27; + detalles : &#x27;&#x27;)
+    }
+    return &#x27;La API respondió con un error (&#x27; + error.response.status + &#x27;).&#x27;
+  }
+  if (error.code === &#x27;ECONNABORTED&#x27;) return &#x27;La API tardó demasiado. Revisa su estado antes de volver a guardar.&#x27;
+  // El navegador no permite distinguir aquí entre CORS, red y servidor detenido.
+  return &#x27;No fue posible contactar la API. Revisa la conexión, su dirección y CORS.&#x27;
+}</pre></div><p>El mensaje aparece dentro de la página, sin <code>alert()</code>. Si falla el guardado, el formulario conserva lo que escribiste. Un timeout no asegura que el servidor no haya guardado, así que actualiza la lista antes de volver a enviar para no duplicar el producto.</p><table class="ref-table"><thead><tr><th>Síntoma</th><th>Qué revisar</th></tr></thead><tbody><tr><td>No aparece la lista</td><td>La URL solicitada, la respuesta en Network y el mensaje del <code>catch</code>.</td></tr><tr><td>Funciona en Postman, pero no en React</td><td>El origen exacto de CORS y la consola del navegador. El puerto también cuenta como parte del origen.</td></tr><tr><td>400 al guardar</td><td>El cuerpo JSON y los tipos del DTO: precio numérico y stock entero no negativo.</td></tr><tr><td>404</td><td>La ruta completa con <code>/api/productos</code> y un id que exista.</td></tr><tr><td>Llega la respuesta, pero la lista no cambia</td><td>Que uses <code>respuesta.data</code> y actualices el estado con <code>setProductos</code>.</td></tr><tr><td>Página HTTPS con API HTTP</td><td>El navegador puede bloquear el contenido mixto. Usa protocolos compatibles.</td></tr></tbody></table></div><div class="section-divider"><span class="num">8</span> Míralo en el navegador</div><div class="card"><p>Con el ejemplo funcionando, abre las herramientas del navegador (F12) y relaciona cada acción con una solicitud HTTP. Sigue estos pasos en orden:</p><ol class="steps"><li>Abre la pestaña <strong>Network</strong> y filtra por Fetch/XHR. Recarga la página y busca el <strong>GET</strong> a <code>/api/productos</code>. Debe tener estado 200.</li><li>En <em>Response</em> verás el arreglo que recibe la página. Es el mismo que llega a <code>setProductos(datos)</code> y después a <code>props.productos</code>.</li><li>Guarda <em>Cuaderno</em>, precio 2500, stock 8. Ubica el <strong>POST</strong> y abre <em>Payload</em>: precio y stock viajan como números y no se envía ningún <code>id</code>.</li><li>Mira la respuesta <strong>201</strong>. El producto vuelve con su <code>id</code>, y eso es lo que <code>crearProducto</code> agrega a la lista.</li><li>Presiona <em>Actualizar lista</em> y compara. El GET devuelve un arreglo y el POST devolvió un objeto.</li><li>Desde Postman envía un precio negativo y mira el <strong>400</strong> con los detalles del DTO. Piensa qué mostraría React en su <code>catch</code> y por qué el formulario conserva los datos.</li></ol><p>Si en desarrollo ves una primera lectura cancelada, es el modo estricto de React comprobando la limpieza del efecto. No significa que el formulario se haya enviado dos veces.</p></div><div class="section-divider"><span class="num">9</span> Cierre y ejercicio</div><div class="card"><p>Antes de seguir, explica con tus palabras el recorrido completo, desde <code>props.onGuardar(dto)</code> hasta el DTO que responde el backend. Señala dónde se valida, dónde se guarda y dónde cambia el estado de React.</p><h3>Ejercicio: eliminar un producto</h3><p>La API ya tiene un DELETE. Tu trabajo es agregar al frontend un botón para eliminar. Avanza por etapas y prueba cada una antes de pasar a la siguiente:</p><ol class="steps"><li>En <code>productoService.js</code>, escribe una función <code>eliminarProducto(id)</code> que use <code>api.delete</code>. Recuerda que la respuesta 204 no trae cuerpo.</li><li>En <code>ProductosPage.jsx</code>, escribe una función <code>eliminar(id)</code> con <code>try/catch</code>. Si el DELETE funciona, quita ese producto del estado con <code>filter</code>. Si falla, muestra el error con <code>MensajeEstado</code>.</li><li>Entrega esa función hacia abajo como una prop con prefijo <code>on</code>, por ejemplo <code>onEliminar</code>, pasando por <code>ListaProductos</code> hasta <code>TarjetaProducto</code>.</li><li>En <code>TarjetaProducto</code>, agrega un <code>Boton</code> que llame a <code>props.onEliminar</code> con el id del producto.</li><li>Compruébalo en Network: debe aparecer un DELETE con estado 204 y la tarjeta tiene que desaparecer sin recargar la página.</li></ol><p>Cuida tres reglas: Axios vive solo en el service, los componentes leen todo con <code>props.algo</code> y la lista se actualiza únicamente después de una respuesta exitosa.</p><p>Referencias: <a href="https://axios-http.com/docs/intro">Axios</a>, <a href="https://axios-http.com/docs/handling_errors">errores en Axios</a>, <a href="https://expressjs.com/en/5x/api.html">Express</a>, <a href="https://docs.spring.io/spring-boot/reference/web/servlet.html">Spring Boot</a> y <a href="https://vite.dev/guide/env-and-mode">variables de entorno de Vite</a>.</p></div></div><footer><strong>DSY1104 · Desarrollo Fullstack II</strong> · Duoc UC · Guía N°20</footer></body></html>

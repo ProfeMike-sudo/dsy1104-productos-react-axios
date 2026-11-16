@@ -1,10 +1,13 @@
-# Productos: React, Axios, Bootstrap y Atomic Design
+# Productos: React, Axios, React Bootstrap y Atomic Design
 
 Ejemplo de DSY1104 para guardar y listar productos desde una API Express. Los componentes reciben `props` y acceden mediante `props.algo`; no se desestructuran las props.
 
-Backend: https://github.com/ProfeMike-sudo/dsy1104-productos-api-express
+Backend (elige uno, el frontend funciona igual con los dos):
 
-Guía HTML autocontenida: [Guía 19: Axios y DTO](docs/19_Axios_React_Express_y_DTO.html). Descárgala y ábrela en un navegador; GitHub muestra su código fuente.
+- Node.js y Express: https://github.com/ProfeMike-sudo/dsy1104-productos-api-express
+- Spring Boot: https://github.com/ProfeMike-sudo/dsy1104-productos-api-springboot
+
+Guía HTML autocontenida: [Guía 20: Axios y DTO](docs/20_Axios_React_Express_y_DTO.html). Descárgala y ábrela en un navegador; GitHub muestra su código fuente.
 
 ## Requisitos y ejecución local
 
@@ -57,12 +60,12 @@ El botón Actualizar lista vuelve a consultar la API. Al recargar el navegador, 
 | Átomos | Boton, Etiqueta, Entrada | Elementos básicos |
 | Moléculas | CampoFormulario, MensajeEstado, TarjetaProducto | Composición de una unidad de interfaz |
 | Organismos | FormularioProducto, ListaProductos | Bloques funcionales |
-| Templates | ProductosTemplate | Distribución de la pantalla mediante Bootstrap |
+| Templates | ProductosTemplate | Distribución de la pantalla mediante React Bootstrap |
 | Pages | ProductosPage | Estado, carga, guardado y errores |
 
 `src/services/` contiene la instancia Axios y las llamadas HTTP; `src/dto/` prepara el cuerpo de entrada. Esas responsabilidades no van en los átomos.
 
-Los hooks usan arreglos como `const [nombre, setNombre] = useState('')`; esto es distinto de desestructurar props. En los componentes se usa `props.valor`, `props.alGuardar`, `props.producto.nombre` y `props.children`.
+Los hooks usan arreglos como `const [nombre, setNombre] = useState('')`; esto es distinto de desestructurar props. En los componentes se usa `props.valor`, `props.onGuardar`, `props.producto.nombre` y `props.children`.
 
 ## Axios y DTO
 
